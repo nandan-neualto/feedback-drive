@@ -121,7 +121,7 @@ export default function FeedbackApp() {
   function closeManager() { setManager(false); history.replaceState({}, '', '/'); void refresh(); }
   function posted(item?: FeedbackItem, queued?: boolean) {
     setComposing(false);
-    if (queued) { setToast({ text: 'Saved on this device. Your feedback will post when connected.' }); void getAllPending().then(items => setPendingCount(items.length)).catch(() => {}); }
+    if (queued) { setToast({ text: 'Saved on this device. Your feedback will send when connected.' }); void getAllPending().then(items => setPendingCount(items.length)).catch(() => {}); }
     else { if (item?.published && item.status !== 'hidden') { setCategory('All'); setFeedback(previous => [item, ...previous.filter(existing => existing.id !== item.id)]); } setToast({ text: item?.published ? 'Your feedback is on the board. Thank you for sharing.' : 'Your feedback was sent privately to the team. Thank you for sharing.' }); void refresh(); }
   }
   function toggleSaved(id: string) {
