@@ -1,8 +1,8 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle2, Clock, Languages, MessageSquare, Moon, Plus, ShieldCheck, Star, Sun, WifiOff, X } from 'lucide-react';
+import { Bookmark, CheckCircle2, Clock, Image as ImageIcon, Languages, MessageSquare, Moon, Plus, Search, ShieldCheck, Sun, WifiOff, X } from 'lucide-react';
 import { answer, categories, fileUrl, type FeedbackItem, type ResponseItem, type Survey } from './model';
 import { languages, usePreferences, type Language } from './i18n';
 import { getAllPending, removePending, request, sendFeedbackPending, sendPending } from './offline';
@@ -10,7 +10,9 @@ import FeedbackComposer from './feedback-composer';
 import ManagerBoard from './manager-board';
 import ResponseFlow from './response-flow';
 import RegisterSW from './register-sw';
-import { Avatar, Modal } from './ui';
+import { Modal } from './ui';
+import { EmptyArtwork, FeedbackCard, PhotoGallery } from './board-widgets';
+import { readSaved, selectFeedback, type BoardSort } from './lib/board';
 
 type Session = { user: { email: string; displayName: string } | null; isAdmin: boolean; authMode?: string };
 type Notice = { text: string; variables?: Record<string, string | number> };
@@ -25,7 +27,10 @@ export default function FeedbackApp() {
   const { t, language, setLanguage, theme, toggleTheme, categoryLabel, number } = usePreferences();
   const [feedback, setFeedback] = useState<FeedbackItem[]>([]), [session, setSession] = useState<Session>({ user: null, isAdmin: false });
   const [loading, setLoading] = useState(true), [online, setOnline] = useState(true), [error, setError] = useState(''), [toast, setToast] = useState<Notice | null>(null);
-  const [category, setCategory] = useState('All'), [composing, setComposing] = useState(false), [manager, setManager] = useState(false), [lightbox, setLightbox] = useState('');
+  const [category, setCategory] = useState('All'), [composing, setComposing] = useState(false), [manager, setManager] = useState(false), [selectedId, setSelectedId] = useState('');
+  const [saved, setSaved] = useState<string[]>([]), [savedOnly, setSavedOnly] = useState(false), [search, setSearch] = useState(''), [sort, setSort] = useState<BoardSort>('newest'), [photosOnly, setPhotosOnly] = useState(false);
+  const [gallery, setGallery] = useState<{ id: string; index: number } | null>(null), [shareLink, setShareLink] = useState('');
+  const searchInput = useRef<HTMLInputElement>(null);
   const [kioskId, setKioskId] = useState('K-01'), [area, setArea] = useState('Experience Zone'), [kiosk, setKiosk] = useState(false), [legacyForm, setLegacyForm] = useState<Survey | null>(null);
   const [pendingCount, setPendingCount] = useState(0), [queueError, setQueueError] = useState<string[]>([]);
   const fetching = useRef(false), syncing = useRef(false);
@@ -84,6 +89,25 @@ export default function FeedbackApp() {
     return () => { clearInterval(timer); window.removeEventListener('online', connect); window.removeEventListener('offline', connect); window.removeEventListener('feedback-station-updated', station); };
   }, [refresh, syncQueue]);
 
+  useEffect(() => {
+    const read = () => { try { setSaved(readSaved(localStorage.getItem('fd-saved'))); } catch { setSaved([]); } };
+    read(); window.addEventListener('storage', read); return () => window.removeEventListener('storage', read);
+  }, []);
+  useEffect(() => {
+    if (loading || error) return;
+    const id = new URLSearchParams(location.search).get('feedback');
+    if (id && feedback.some(item => item.id === id && item.published && item.status !== 'hidden')) setSelectedId(id);
+    else if (id) { const url = new URL(location.href); url.searchParams.delete('feedback'); history.replaceState({}, '', url.pathname + url.search); setSelectedId(''); setGallery(null); setToast({ text: 'This feedback is no longer on the public board.' }); }
+    if (gallery && !feedback.some(item => item.id === gallery.id)) setGallery(null);
+  }, [feedback, loading, error]);
+  useEffect(() => {
+    const keyboard = (event: KeyboardEvent) => {
+      if (manager || composing || selectedId || gallery || shareLink || legacyForm || event.metaKey || event.ctrlKey || event.altKey) return;
+      if (event.key === '/' && !(event.target instanceof HTMLElement && (['INPUT','TEXTAREA','SELECT'].includes(event.target.tagName) || event.target.isContentEditable))) { event.preventDefault(); searchInput.current?.focus(); }
+    };
+    document.addEventListener('keydown', keyboard); return () => document.removeEventListener('keydown', keyboard);
+  }, [manager, composing, selectedId, gallery, shareLink, legacyForm]);
+
   useEffect(() => { if (!toast) return; const timer = setTimeout(() => setToast(null), 6500); return () => clearTimeout(timer); }, [toast]);
   useEffect(() => {
     if (!manager && !(composing && kiosk)) return;
@@ -98,23 +122,43 @@ export default function FeedbackApp() {
   function posted(item?: FeedbackItem, queued?: boolean) {
     setComposing(false);
     if (queued) { setToast({ text: 'Saved on this device. Your feedback will post when connected.' }); void getAllPending().then(items => setPendingCount(items.length)).catch(() => {}); }
-    else { if (item?.published && item.status !== 'hidden') { setCategory('All'); setFeedback(previous => [item, ...previous.filter(existing => existing.id !== item.id)]); } setToast({ text: 'Your feedback is on the board. Thank you for sharing.' }); void refresh(); }
+    else { if (item?.published && item.status !== 'hidden') { setCategory('All'); setFeedback(previous => [item, ...previous.filter(existing => existing.id !== item.id)]); } setToast({ text: item?.published ? 'Your feedback is on the board. Thank you for sharing.' : 'Your feedback was sent privately to the team. Thank you for sharing.' }); void refresh(); }
   }
-  const visible = feedback.filter(item => category === 'All' || item.category === category);
-  const overlay = manager || Boolean(legacyForm) || Boolean(lightbox);
+  function toggleSaved(id: string) {
+    const next = saved.includes(id) ? saved.filter(value => value !== id) : [id, ...saved].slice(0, 500);
+    try { localStorage.setItem('fd-saved', JSON.stringify(next)); setSaved(next); setToast({ text: saved.includes(id) ? 'Removed from saved feedback.' : 'Saved to this device.' }); }
+    catch { setToast({ text: 'This device could not save the feedback. Check your browser storage settings.' }); }
+  }
+  async function share(item: FeedbackItem) {
+    const url = new URL('/', location.origin); url.searchParams.set('feedback', item.id);
+    try { await navigator.clipboard.writeText(url.toString()); setToast({ text: 'Link copied. Pass the thought along.' }); }
+    catch { setShareLink(url.toString()); }
+  }
+  function openFeedback(id: string) { setSelectedId(id); const url = new URL(location.href); url.searchParams.set('feedback', id); history.replaceState({}, '', url.pathname + url.search); }
+  function closeFeedback() { setSelectedId(''); const url = new URL(location.href); url.searchParams.delete('feedback'); history.replaceState({}, '', url.pathname + url.search); }
+  const clearFilters = () => { setCategory('All'); setSearch(''); setPhotosOnly(false); };
+  const visible = useMemo(() => selectFeedback(feedback, { category, search, sort, photosOnly, savedOnly, saved }), [feedback, category, search, sort, photosOnly, savedOnly, saved]);
+  const selected = feedback.find(item => item.id === selectedId && item.published && item.status !== 'hidden');
+  const galleryItem = gallery && feedback.find(item => item.id === gallery.id && item.published && item.status !== 'hidden');
+  const savedCount = feedback.filter(item => saved.includes(item.id)).length;
+  const filtered = Boolean(search.trim() || photosOnly || category !== 'All');
+  const overlay = manager || Boolean(legacyForm) || Boolean(selected) || Boolean(galleryItem) || Boolean(shareLink);
+  const photo = (item: FeedbackItem, index: number) => setGallery({ id: item.id, index });
 
   return <div className="feedback-app"><RegisterSW />
     <div inert={overlay || undefined}>
       <header className="feedback-header"><Link href="/" className="feedback-brand" aria-label={t('Feedback Drive home')}><span className="brand-mark"><MessageSquare size={22} strokeWidth={1.8} /></span><span className="brand-name">Feedback <span>Drive</span></span></Link><div className="feedback-header-actions"><div className="preference-controls"><label className="language-control"><Languages size={16} aria-hidden="true" /><select className="language-select" aria-label={t('Language')} value={language} onChange={event => setLanguage(event.target.value as Language)}>{languages.map(item => <option key={item.code} value={item.code} lang={item.code}>{item.label}</option>)}</select></label><button className="icon-button theme-toggle" onClick={toggleTheme} aria-pressed={theme === 'dark'} aria-label={t(theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode')} title={t(theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode')}>{theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}</button></div><button className="button ghost small manager-button" aria-label={t('Manager board')} onClick={() => { setManager(true); history.replaceState({}, '', '/?view=admin'); }}><ShieldCheck size={16} /><span className="manager-label">{t('Manager board')}</span></button><button className="button primary add-feedback-button" aria-expanded={composing} aria-controls="feedback-compose-region" onClick={openComposer}><Plus size={18} />{t('Add feedback')}</button></div></header>
       <main className="feedback-main">
-        <div className="board-heading"><div><h1 className="board-title">{t('Feedback')}</h1><p className="board-description">{t('A space for your thoughts, ideas, and experiences.')}</p></div>{feedback.length > 0 && <span className="board-count">{t('{count} shared', { count: number(feedback.length) })}</span>}</div>
+        <div className="board-heading"><div><div className="wall-eyebrow"><span aria-hidden="true" />{t('A better experience starts with you.')}</div><h1 className="board-title">{t('Feedback')}</h1><p className="board-description">{t('Little thoughts. Meaningful change.')}</p></div>{feedback.length > 0 && <span className="board-count"><MessageSquare size={16} />{t('{count} shared', { count: number(feedback.length) })}</span>}</div>
         {!online && <div className="error-banner" role="status"><WifiOff size={17} /><span>{t('You’re offline. Feedback and photos will be saved on this device until connected.')}</span></div>}
         {error && online && <div className="error-banner" role="alert"><span>{t(error)}</span><button className="button ghost small" onClick={() => void refresh()}>{t('Retry')}</button></div>}
         {pendingCount > 0 && <div className="panel queue-banner" role="status"><Clock size={17} /><span>{t('{count} saved posts waiting to send.', { count: number(pendingCount) })} {queueError.length > 0 && t('Needs attention: {message}', { message: queueError.map(message => t(message)).join(' ') })}</span><button className="button small" disabled={!online} onClick={() => void syncQueue()}>{t('Retry sync')}</button></div>}
+        <div className="wall-controls"><div className="wall-view-tabs" role="group" aria-label={t('Public feedback')}><button aria-pressed={!savedOnly} onClick={() => setSavedOnly(false)}><MessageSquare size={14} />{t('Latest thoughts')}</button><button aria-pressed={savedOnly} onClick={() => setSavedOnly(true)}><Bookmark size={14} />{t('Saved')}{savedCount > 0 && <span>{number(savedCount)}</span>}</button></div><div className="wall-tools"><label className="wall-search"><Search size={16} /><input ref={searchInput} aria-label={t('Search public feedback')} placeholder={t('Search thoughts, ideas or experiences…')} value={search} onChange={event => setSearch(event.target.value)} onKeyDown={event => { if (event.key === 'Escape') { setSearch(''); searchInput.current?.blur(); } }} />{search && <button aria-label={t('Clear search')} onClick={() => setSearch('')}><X size={14} /></button>}</label><button className="wall-photo-filter" aria-pressed={photosOnly} onClick={() => setPhotosOnly(value => !value)}><ImageIcon size={14} />{t('With photos')}</button><select className="select-input wall-sort" aria-label={t('Sort feedback')} value={sort} onChange={event => setSort(event.target.value as BoardSort)}><option value="newest">{t('Newest first')}</option><option value="oldest">{t('Oldest first')}</option><option value="rated">{t('Highest rated')}</option></select></div></div>
         <div className="category-tabs" role="group" aria-label={t('Filter feedback by category')}>{['All', ...categories].map(value => { const count = feedback.filter(item => value === 'All' || item.category === value).length; return <button key={value} className={`category-tab ${category === value ? 'active' : ''}`} aria-pressed={category === value} onClick={() => setCategory(value)}>{categoryLabel(value)}{count > 0 && <span>{number(count)}</span>}</button>; })}</div>
+        {filtered && <div className="wall-results"><span role="status">{t(visible.length === 1 ? '{count} result' : '{count} results', { count: number(visible.length) })}</span><button className="button ghost small" onClick={clearFilters}>{t('Clear filters')}</button></div>}
         <div className={`feedback-layout ${composing ? 'composing' : ''}`}>
           <section className="feedback-feed" aria-label={t('Public feedback')} aria-busy={loading}>
-            {loading ? <div className="feedback-grid">{[1, 2, 3].map(value => <div className="skeleton" key={value} />)}</div> : visible.length ? <div className="feedback-grid">{visible.map(item => <FeedbackCard key={item.id} item={item} onPhoto={setLightbox} />)}</div> : <div className="feedback-empty"><div className="feedback-empty-art"><MessageSquare size={28} strokeWidth={1.5} /></div><div className="feedback-empty-card"><h2>{t(category === 'All' ? 'Start a conversation.' : 'No feedback in this category yet.')}</h2><p>{t('Share what worked well, or what could be better.')}</p><button className="button primary" onClick={openComposer}><Plus size={17} />{t('Add feedback')}</button>{category !== 'All' && <button className="button ghost small" onClick={() => setCategory('All')}>{t('Show all feedback')}</button>}</div></div>}
+            {loading ? <div className="feedback-grid">{[1, 2, 3].map(value => <div className="skeleton" key={value} />)}</div> : visible.length ? <div className="feedback-grid">{visible.map(item => <FeedbackCard key={item.id} item={item} saved={saved.includes(item.id)} onSave={toggleSaved} onShare={share} onOpen={openFeedback} onPhoto={photo} />)}</div> : <div className="feedback-empty"><EmptyArtwork /><div className="feedback-empty-card"><h2>{t(filtered ? 'No matching thoughts.' : savedOnly ? 'Save the thoughts that stay with you.' : 'Nothing here just yet.')}</h2><p>{t(filtered ? 'Try a different search or clear your filters.' : savedOnly ? 'Tap the bookmark on a post. Your saved feedback stays on this device.' : 'Share what worked well, or what could be better.')}</p>{filtered ? <button className="button secondary" onClick={clearFilters}>{t('Clear filters')}</button> : savedOnly ? <button className="button secondary" onClick={() => setSavedOnly(false)}>{t('Show all feedback')}</button> : <button className="button primary" onClick={openComposer}><Plus size={17} />{t('Add feedback')}</button>}</div></div>}
           </section>
           <div id="feedback-compose-region">{composing && <FeedbackComposer kioskId={kioskId} area={area} onClose={() => setComposing(false)} onPosted={posted} />}</div>
         </div>
@@ -123,21 +167,8 @@ export default function FeedbackApp() {
     </div>
     {manager && <div className="manager-overlay"><ManagerBoard session={session} kioskId={kioskId} area={area} onSettings={(id, nextArea) => { setKioskId(id); setArea(nextArea); localStorage.setItem('sd-kiosk-id', id); localStorage.setItem('sd-area', nextArea); }} onClose={closeManager} onUpdated={() => void refresh()} /></div>}
     {legacyForm && <div className="legacy-form-overlay"><ResponseFlow survey={legacyForm} kiosk={kiosk} kioskId={kioskId} area={area} onClose={() => { setLegacyForm(null); history.replaceState({}, '', '/'); void refresh(); }} onQueued={() => { void getAllPending().then(items => setPendingCount(items.length)).catch(() => {}); }} /></div>}
-    {lightbox && <Modal title={t('Feedback photo')} onClose={() => setLightbox('')} wide><img className="feedback-lightbox-image" src={lightbox} alt={t('Full size photo shared with feedback')} /></Modal>}
+    {galleryItem && gallery ? <Modal title={t('Feedback photo')} onClose={() => setGallery(null)} wide><PhotoGallery item={galleryItem} index={gallery.index} onIndex={index => setGallery(value => value ? { ...value, index } : null)} /></Modal> : selected && !shareLink && <Modal title={t('Feedback')} onClose={closeFeedback}><FeedbackCard item={selected} full saved={saved.includes(selected.id)} onSave={toggleSaved} onShare={share} onPhoto={photo} /></Modal>}
+    {shareLink && <Modal title={t('Copy feedback link')} onClose={() => setShareLink('')}><div className="wall-share-fallback"><p>{t('Copy this link to share the feedback.')}</p><input aria-label={t('Copy feedback link')} readOnly value={shareLink} onFocus={event => event.currentTarget.select()} /></div></Modal>}
     {toast && <div className="toast" role="status"><CheckCircle2 size={18} /><span>{t(toast.text, toast.variables)}</span><button className="icon-button" aria-label={t('Dismiss message')} onClick={() => setToast(null)}><X size={14} /></button></div>}
   </div>;
-}
-
-function FeedbackCard({ item, onPhoto }: { item: FeedbackItem; onPhoto: (url: string) => void }) {
-  const { t, categoryLabel, statusLabel, formatDate, number } = usePreferences();
-  const [expanded, setExpanded] = useState(false);
-  const long = item.message.length > 420;
-  const autoTitle = item.message.length > 80 ? `${item.message.slice(0, 77).trimEnd()}…` : item.message;
-  const showTitle = item.title && item.title !== autoTitle && item.title !== item.message;
-  return <article className="feedback-card">
-    <div className="feedback-card-top"><Avatar value={item.avatar} /><div className="grow"><strong>{!item.name || item.name === 'Anonymous' ? t('Anonymous') : item.publicName || item.name}</strong><span className="help-text block">{formatDate(item.createdAt)}</span></div>{item.status !== 'new' && <span className="feedback-status">{statusLabel(item.status)}</span>}</div>
-    <div className="feedback-card-body"><div className="feedback-card-meta"><span>{categoryLabel(item.category)}</span>{item.rating && <span aria-label={t('{rating} out of 5 stars', { rating: number(item.rating) })}><Star size={13} fill="currentColor" />{number(item.rating)}/5</span>}</div>{showTitle && <h2 className="feedback-card-title">{item.title}</h2>}<p style={{ whiteSpace: 'pre-wrap' }}>{long && !expanded ? `${item.message.slice(0, 420)}…` : item.message}</p>{long && <button className="button ghost small" aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>{t(expanded ? 'Read less' : 'Read more')}</button>}{item.suggestion && <div className="feedback-suggestion"><span className="detail-label">{t('Suggested improvement')}</span><p>{item.suggestion}</p></div>}</div>
-    {item.photos.length > 0 && <div className="feedback-photo-grid">{item.photos.map((photo, index) => <button key={photo} className="feedback-image" aria-label={t('View feedback photo {number}', { number: number(index + 1) })} onClick={() => onPhoto(fileUrl(photo))}><img src={fileUrl(photo)} loading="lazy" alt={t('Photo {number} shared with feedback', { number: number(index + 1) })} /></button>)}</div>}
-    {item.area && item.area !== 'Experience Zone' && <div className="feedback-card-footer"><span className="help-text">{item.area}</span></div>}
-  </article>;
 }

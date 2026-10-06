@@ -4,6 +4,7 @@ import { createContext, useContext, useEffect, useSyncExternalStore, type ReactN
 import { publicCatalog } from './locales/public';
 import { composerCatalog } from './locales/composer';
 import { managerCatalog } from './locales/manager';
+import { polishCatalog } from './locales/polish';
 
 export type Language = 'en' | 'kn' | 'hi' | 'ja';
 export type Theme = 'light' | 'dark';
@@ -15,9 +16,9 @@ export const languages: { code: Language; label: string; locale: string }[] = [
   { code: 'ja', label: '日本語', locale: 'ja-JP' },
 ];
 const catalogs: TranslationCatalog = {
-  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn },
-  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi },
-  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja },
+  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn, ...polishCatalog.kn },
+  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi, ...polishCatalog.hi },
+  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja, ...polishCatalog.ja },
 };
 const preferenceKey = 'fd-preferences';
 const preferenceEvent = 'feedback-preferences-updated';

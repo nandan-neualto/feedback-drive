@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import "./feedback-overhaul.css";
 import "./feedback-minimal.css";
+import "./feedback-polish.css";
 import PreferencesProvider from "./i18n";
 import { preferenceBootstrap } from "./preferences-script";
 
