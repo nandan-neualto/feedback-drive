@@ -1,13 +1,14 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowUpRight, Bookmark, CheckCheck, ChevronLeft, ChevronRight, Download, Image as ImageIcon, MessageSquare, Share2, Sparkles, Star } from 'lucide-react';
+import { ArrowUpRight, Bookmark, CheckCheck, ChevronLeft, ChevronRight, Download, Image as ImageIcon, Share2, Sparkles, Star } from 'lucide-react';
 import { type FeedbackItem, fileUrl } from './model';
 import { usePreferences } from './i18n';
+import { GarageArtwork } from './toyota-brand';
 import { Avatar } from './ui';
 
 export function EmptyArtwork() {
-  return <div className="wall-art" aria-hidden="true"><div className="wall-orbit" /><div className="wall-note wall-note-back"><span /><span /><span /></div><div className="wall-note wall-note-front"><MessageSquare size={27} strokeWidth={1.5} /><div><span /><span /></div><span className="wall-art-check"><CheckCheck size={16} /></span></div><span className="wall-art-spark"><Sparkles size={21} /></span></div>;
+  return <GarageArtwork />;
 }
 
 export function FeedbackCard({ item, onPhoto, saved, onSave, onShare, onOpen, full = false }: {

@@ -3,11 +3,12 @@ import "./globals.css";
 import "./feedback-overhaul.css";
 import "./feedback-minimal.css";
 import "./feedback-polish.css";
+import "./toyota-theme.css";
 import PreferencesProvider from "./i18n";
 import { preferenceBootstrap } from "./preferences-script";
 
 export const metadata: Metadata = {
-  title: "Feedback Drive | Your feedback, in focus",
+  title: "Feedback Drive | Your voice. Our next gear.",
   description: "A live feedback board. Share what you think, add photos, and see the conversation move forward.",
   manifest: "/manifest.webmanifest",
   icons: {
@@ -23,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><meta name="theme-color" content="#faf9f6" /><script dangerouslySetInnerHTML={{ __html: preferenceBootstrap }} /></head>
+      <head><meta name="theme-color" content="#eb0a1e" /><script dangerouslySetInnerHTML={{ __html: preferenceBootstrap }} /></head>
       <body className="antialiased"><PreferencesProvider>{children}</PreferencesProvider></body>
     </html>
   );

@@ -5,6 +5,7 @@ import { publicCatalog } from './locales/public';
 import { composerCatalog } from './locales/composer';
 import { managerCatalog } from './locales/manager';
 import { polishCatalog } from './locales/polish';
+import { toyotaCatalog } from './locales/toyota';
 
 export type Language = 'en' | 'kn' | 'hi' | 'ja';
 export type Theme = 'light' | 'dark';
@@ -16,9 +17,9 @@ export const languages: { code: Language; label: string; locale: string }[] = [
   { code: 'ja', label: '日本語', locale: 'ja-JP' },
 ];
 const catalogs: TranslationCatalog = {
-  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn, ...polishCatalog.kn },
-  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi, ...polishCatalog.hi },
-  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja, ...polishCatalog.ja },
+  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn, ...polishCatalog.kn, ...toyotaCatalog.kn },
+  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi, ...polishCatalog.hi, ...toyotaCatalog.hi },
+  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja, ...polishCatalog.ja, ...toyotaCatalog.ja },
 };
 const preferenceKey = 'fd-preferences';
 const preferenceEvent = 'feedback-preferences-updated';
