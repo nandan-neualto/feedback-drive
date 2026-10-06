@@ -6,7 +6,7 @@ export type Survey = { id: string; title: string; description: string; category:
 type SurveyRow = { id: string; title: string; description: string; category: string; status: string; questions: string; created_at: string; updated_at: string; created_by: string; response_count?: number; cover_image: string | null; allow_photos: number; require_name: number; show_on_board: number; closes_at: string | null };
 type ResponseRow = { id: string; survey_id: string; survey_title?: string; category?: string; name: string; contact: string; avatar: string; answers: string; questions_snapshot: string; photos: string; consent: number; status: string; featured: number; kiosk_id: string; area: string; request_id: string; created_at: string };
 export type UploadRow = { key: string; object_key: string; content_type: string; size: number; purpose: string; response_id: string | null; survey_id: string | null; feedback_id: string | null; created_at: string; expires_at: string };
-type WorkerEnv = { DB?: D1Database; BUCKET?: R2Bucket; ADMIN_EMAILS?: string };
+type WorkerEnv = { DB?: D1Database; BUCKET?: R2Bucket; ADMIN_EMAILS?: string; AUTH_MODE?: string };
 const bindings = env as unknown as WorkerEnv;
 const questionTypes = new Set(["short", "long", "single", "multiple", "rating", "yesno"]);
 const responseStatuses = new Set(["new", "reviewed", "shortlisted", "adopted", "hidden"]);
@@ -79,7 +79,7 @@ export async function session(request: Request) {
   const allowed = (bindings.ADMIN_EMAILS ?? "").split(",").map((item) => item.trim().toLowerCase()).filter(Boolean);
   const host = new URL(request.url).hostname;
   const localMock = ["127.0.0.1", "localhost", "[::1]", "::1"].includes(host) && email === "seedy@sites.test";
-  return { user: identity ? { email: identity.email, displayName: identity.displayName } : null, isAdmin: Boolean(email && (allowed.includes(email) || localMock)) };
+  return { authMode: bindings.AUTH_MODE === "password" ? "password" : "chatgpt", user: identity ? { email: identity.email, displayName: identity.displayName } : null, isAdmin: Boolean(email && (allowed.includes(email) || localMock)) };
 }
 export async function admin(request: Request) { const auth = await session(request); if (!auth.isAdmin || !auth.user) throw new ApiError("Administrator access is required.", 403); return auth.user; }
 export function sameOrigin(request: Request) {

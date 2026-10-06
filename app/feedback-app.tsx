@@ -12,7 +12,7 @@ import ResponseFlow from './response-flow';
 import RegisterSW from './register-sw';
 import { Avatar, Modal } from './ui';
 
-type Session = { user: { email: string; displayName: string } | null; isAdmin: boolean };
+type Session = { user: { email: string; displayName: string } | null; isAdmin: boolean; authMode?: string };
 type Notice = { text: string; variables?: Record<string, string | number> };
 
 function legacyFeedback(response: ResponseItem): FeedbackItem {
