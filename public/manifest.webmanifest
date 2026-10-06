@@ -1,0 +1,14 @@
+{
+  "id": "/",
+  "name": "Feedback Drive",
+  "short_name": "Feedback Drive",
+  "description": "Share your experience and photos to help shape a better drive.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#faf9f6",
+  "theme_color": "#faf9f6",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
