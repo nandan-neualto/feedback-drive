@@ -1,7 +1,7 @@
 # Toyota theme assets
 
-- `public/toyota/toyota-logo.svg`: unmodified horizontal-logo artwork published at https://brand.toyota.com/content/dam/brandhub/guidelines/logo/two-column/BHUB_Logo_ToyotaLogo_01.svg. The image is displayed through a CSS viewport that removes its demonstration artboard margins. Source guidelines: https://brand.toyota.com/guidelines/visual/logos.
-- Brand palette reference: https://brand.toyota.com/guidelines/visual/brand-colors (Toyota red `#EB0A1E`, black, white). The dark-mode UI uses a lighter red for readable small controls.
+- `public/toyota/toyota-industries-group.svg`: scalable recreation of the user-supplied Toyota Industries Group lockup. It preserves the supplied blue-violet symbol, italic TOYOTA wordmark, and black group caption. Symbol and wordmark paths come from the published Toyota Industries header asset at https://www.toyota-industries.com/assets/images/components/site_header/logo.svg, arranged to match the supplied reference. This is a recreation of the reference, not an unmodified official lockup.
+- Brand palette reference: https://brand.toyota.com/guidelines/visual/brand-colors (Toyota red `#EB0A1E`, black, white). Toyota red remains in the car scene. The interface uses the blue-violet of the supplied reference, with a lighter tone for readable dark-mode controls.
 - `public/toyota/car-hero.webp`: AI-generated illustrative sports coupe, generated with the built-in image-generation tool in generation mode with `transparent_background: true`, then encoded as WebP using Sharp. It is decorative, and does not represent an offered vehicle or verified model specification. Original generated file remains in the local generated-images directory.
 - `public/favicon.svg`: original code-native car icon; not a Toyota emblem.
 

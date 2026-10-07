@@ -1,17 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ArrowDown, ArrowUpRight, Flag, Gauge, MessageSquare, Pause, Play, Plus } from 'lucide-react';
+import { ArrowUpRight, Camera, Pause, Play, Plus } from 'lucide-react';
 import { usePreferences } from './i18n';
 
 export function ToyotaLogo() {
-  return <span className="toyota-logo"><img src="/toyota/toyota-logo.svg" alt="Toyota" width="520" height="347" /></span>;
+  return <span className="toyota-logo"><img src="/toyota/toyota-industries-group.svg" alt="Toyota Industries Group" width="300" height="106" /></span>;
 }
 
-export function ToyotaHero({ count, onAdd }: { count: number; onAdd: () => void }) {
-  const { t, number } = usePreferences();
-  const [paused, setPaused] = useState(true);
-  const [reduced, setReduced] = useState(false);
+export function ToyotaCorner({ onAdd, composing }: { onAdd: () => void; composing: boolean }) {
+  const { t } = usePreferences();
+  const [paused, setPaused] = useState(true), [reduced, setReduced] = useState(false);
   useEffect(() => {
     const query = window.matchMedia('(prefers-reduced-motion: reduce)');
     const update = () => { setReduced(query.matches); if (query.matches) setPaused(true); };
@@ -19,25 +18,10 @@ export function ToyotaHero({ count, onAdd }: { count: number; onAdd: () => void 
     query.addEventListener('change', update);
     return () => query.removeEventListener('change', update);
   }, []);
-  return <section className={`toyota-hero ${paused ? 'motion-paused' : ''}`} aria-labelledby="drive-title">
-    <div className="drive-grid" aria-hidden="true" />
-    <div className="drive-hero-copy">
-      <span className="drive-eyebrow"><span className="drive-stripes" aria-hidden="true"><i /><i /><i /></span>{t('Built around your experience')}</span>
-      <h1 id="drive-title">{t('Your voice.')}<br /><span>{t('Our next gear.')}</span></h1>
-      <p>{t('Every drive has a story. Share yours and help shape what comes next.')}</p>
-      <div className="drive-hero-actions"><button className="button primary" onClick={onAdd}><Plus size={17} />{t('Add feedback')}<ArrowUpRight size={17} /></button><a href="#feedback-wall">{t('Explore feedback')}<ArrowDown size={15} /></a></div>
-      <div className="drive-hero-note"><MessageSquare size={14} /><span>{t('Real experiences. Better journeys.')}</span></div>
-    </div>
-    <div className="drive-scene" aria-hidden="true">
-      <div className="drive-ring" /><div className="drive-speed-lines"><i /><i /><i /></div>
-      <span className="drive-outline-word">DRIVE</span>
-      <div className="drive-road"><span /><span /><span /></div>
-      <img className="drive-car" src="/toyota/car-hero.webp" alt="" width="1536" height="1024" fetchPriority="high" />
-      <div className="drive-scene-label"><Gauge size={17} /><span>FEEDBACK / DRIVE</span><span className="drive-label-line" /><Flag size={15} /></div>
-    </div>
-    {!reduced && <button className="drive-motion-control" aria-pressed={paused} aria-label={t(paused ? 'Play motion' : 'Pause motion')} onClick={() => setPaused(value => !value)}>{paused ? <Play size={12} /> : <Pause size={12} />}<span>{t(paused ? 'Play motion' : 'Pause motion')}</span></button>}
-    <div className="drive-hero-bottom"><span><span className="drive-live-dot" />{t('The feedback lane is open')}</span><span>{t('{count} shared', { count: number(count) })}<ArrowDown size={12} /></span></div>
-  </section>;
+  return <div className={'drive-corner-card ' + (paused ? 'motion-paused' : '')}>
+    <div className="drive-scene"><div className="drive-grid" aria-hidden="true" /><span className="drive-outline-word" aria-hidden="true">DRIVE</span><div className="drive-road" aria-hidden="true"><span /><span /></div><img className="drive-car" src="/toyota/car-hero.webp" alt="" width="1536" height="1024" loading="lazy" /><span className="drive-scene-tag">{t('Ideas in motion')}</span>{!reduced && <button className="drive-motion-control" aria-pressed={paused} aria-label={t(paused ? 'Play motion' : 'Pause motion')} title={t(paused ? 'Play motion' : 'Pause motion')} onClick={() => setPaused(value => !value)}>{paused ? <Play size={13} /> : <Pause size={13} />}</button>}</div>
+    {!composing && <div className="drive-corner-copy"><div className="drive-corner-title"><h2>{t('A small idea can go a long way.')}</h2><Camera size={18} aria-hidden="true" /></div><p>{t('Share a thought, an experience, or a photo.')}</p><button className="drive-corner-launch" aria-controls="feedback-compose-region" aria-expanded={composing} onClick={onAdd}><Plus size={16} /><span>{t('Add feedback')}</span><ArrowUpRight size={17} /></button></div>}
+  </div>;
 }
 
 export function GarageArtwork() {

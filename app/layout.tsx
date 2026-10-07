@@ -8,7 +8,7 @@ import PreferencesProvider from "./i18n";
 import { preferenceBootstrap } from "./preferences-script";
 
 export const metadata: Metadata = {
-  title: "Feedback Drive | Your voice. Our next gear.",
+  title: "Feedback Drive | Ideas in motion",
   description: "A live feedback board. Share what you think, add photos, and see the conversation move forward.",
   manifest: "/manifest.webmanifest",
   icons: {
@@ -24,7 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head><meta name="theme-color" content="#eb0a1e" /><script dangerouslySetInnerHTML={{ __html: preferenceBootstrap }} /></head>
+      <head><meta name="theme-color" content="#3210a8" /><script dangerouslySetInnerHTML={{ __html: preferenceBootstrap }} /></head>
       <body className="antialiased"><PreferencesProvider>{children}</PreferencesProvider></body>
     </html>
   );
