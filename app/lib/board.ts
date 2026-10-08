@@ -1,13 +1,15 @@
 import type { FeedbackItem } from '../model';
 
 export type BoardSort = 'newest' | 'oldest' | 'rated';
-export type BoardFilters = { category: string; search: string; sort: BoardSort; photosOnly: boolean; savedOnly: boolean; saved: string[] };
+export type BoardStatus = 'all' | 'new' | 'reviewed' | 'shortlisted' | 'adopted';
+export type BoardFilters = { category: string; status?: BoardStatus; search: string; sort: BoardSort; photosOnly: boolean; savedOnly: boolean; saved: string[] };
 const normalize = (value: string) => value.normalize('NFKC').toLowerCase();
 export function selectFeedback(items: FeedbackItem[], filters: BoardFilters): FeedbackItem[] {
   const words = normalize(filters.search.trim()).split(/\s+/).filter(Boolean);
   const saved = new Set(filters.saved);
   return items.filter(item => {
     if (!item.published || item.status === 'hidden') return false;
+    if (filters.status && filters.status !== 'all' && item.status !== filters.status) return false;
     if (filters.category !== 'All' && item.category !== filters.category) return false;
     if (filters.photosOnly && !item.photos.length) return false;
     if (filters.savedOnly && !saved.has(item.id)) return false;

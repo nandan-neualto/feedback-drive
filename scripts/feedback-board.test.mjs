@@ -25,3 +25,9 @@ test('saved-post storage tolerates corruption and rejects invalid values', () =>
   assert.deepEqual(readSaved('{}'), []);
   assert.deepEqual(readSaved('["abc","abc",null,"https://evil.test","def"]'), ['abc', 'def']);
 });
+
+test('progress filtering composes with photos, saved and category without revealing hidden ideas', () => {
+  const items = [make('adopted', { status: 'adopted', photos: ['photo'] }), make('private', { status: 'adopted', published: false }), make('other-category', { status: 'adopted', category: 'Safety', photos: ['photo'] }), make('new')];
+  assert.deepEqual(selectFeedback(items, { ...filters, status: 'adopted', category: 'Service', photosOnly: true, savedOnly: true, saved: ['adopted', 'private', 'other-category'] }).map(x => x.id), ['adopted']);
+  assert.deepEqual(selectFeedback(items, { ...filters, status: 'reviewed' }), []);
+});
