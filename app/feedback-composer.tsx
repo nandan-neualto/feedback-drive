@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState, type FormEvent } from 'react';
-import { Camera, CheckCircle2, ChevronDown, Eye, ImagePlus, LockKeyhole, Send, Star, Trash2, Upload, X } from 'lucide-react';
+import { Camera, CheckCircle2, ChevronDown, Eye, ImagePlus, LockKeyhole, Minus, Send, Star, Trash2, Upload, X } from 'lucide-react';
 import { avatars, categories, colors, uid, type FeedbackItem, type FeedbackPayload } from './model';
 import { savePending, sendFeedbackPending, type PendingFeedback } from './offline';
 import { CameraCapture, processImage } from './response-flow';
@@ -9,7 +9,7 @@ import { usePreferences } from './i18n';
 import { Avatar } from './ui';
 
 type Attachment = { blob: Blob; name: string };
-type Props = { kioskId: string; area: string; onClose: () => void; onPosted: (feedback?: FeedbackItem, queued?: boolean) => void };
+type Props = { initialCategory?: string; onMinimize?: () => void; kioskId: string; area: string; onClose: () => void; onPosted: (feedback?: FeedbackItem, queued?: boolean) => void };
 type Errors = { message?: string; consent?: string; contact?: string };
 
 function usePhotoUrl(blob?: Blob) {
@@ -28,9 +28,9 @@ function PhotoPreview({ file, index, onRemove }: { file: Attachment; index: numb
   return <div className="photo-thumb"><img src={url || undefined} alt={t("Attached photo {count}", { count: index + 1 })} /><button type="button" className="remove-photo" aria-label={t("Remove photo {count}", { count: index + 1 })} onClick={onRemove}><X size={14} /></button></div>;
 }
 
-export default function FeedbackComposer({ kioskId, area, onClose, onPosted }: Props) {
+export default function FeedbackComposer({ kioskId, area, onClose, onPosted, initialCategory = 'Others', onMinimize }: Props) {
   const { t, categoryLabel, number } = usePreferences();
-  const [category, setCategory] = useState('Others'), [title, setTitle] = useState(''), [message, setMessage] = useState(''), [suggestion, setSuggestion] = useState(''), [rating, setRating] = useState<number>();
+  const [category, setCategory] = useState(initialCategory), [title, setTitle] = useState(''), [message, setMessage] = useState(''), [suggestion, setSuggestion] = useState(''), [rating, setRating] = useState<number>();
   const [name, setName] = useState(''), [contact, setContact] = useState(''), [avatar, setAvatar] = useState('default'), [selfie, setSelfie] = useState<Attachment>();
   const [visibility, setVisibility] = useState<'public' | 'private'>('public');
   const [photos, setPhotos] = useState<Attachment[]>([]), [consent, setConsent] = useState(false), [more, setMore] = useState(false), [profile, setProfile] = useState(false), [contactOpen, setContactOpen] = useState(false);
@@ -38,11 +38,20 @@ export default function FeedbackComposer({ kioskId, area, onClose, onPosted }: P
   const submitLock = useRef(false), imageLock = useRef(false), requestId = useRef('');
   const messageInput = useRef<HTMLTextAreaElement>(null), consentInput = useRef<HTMLInputElement>(null), contactInput = useRef<HTMLInputElement>(null);
   const photoInput = useRef<HTMLInputElement>(null), cameraInput = useRef<HTMLInputElement>(null), selfieInput = useRef<HTMLInputElement>(null);
+  const discardBox = useRef<HTMLDivElement>(null);
   const selfieUrl = usePhotoUrl(selfie?.blob);
   const disabled = busy || photoBusy;
-  const dirty = Boolean(title || message || suggestion || rating || name || contact || selfie || photos.length || consent || avatar !== 'default' || category !== 'Others');
+  const dirty = Boolean(title || message || suggestion || rating || name || contact || selfie || photos.length || consent || avatar !== 'default' || category !== initialCategory);
 
   useEffect(() => { messageInput.current?.focus({ preventScroll: true }); }, []);
+
+  useEffect(() => {
+    if (!dirty || result) return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty, result]);
+  useEffect(() => { if (discard) { discardBox.current?.scrollIntoView({ block:'nearest' }); discardBox.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll:true }); } }, [discard]);
 
   function close() {
     if (disabled || camera) return;
@@ -112,9 +121,9 @@ export default function FeedbackComposer({ kioskId, area, onClose, onPosted }: P
     } finally { submitLock.current = false; setBusy(false); }
   }
 
-  return <section className="feedback-composer" aria-labelledby="feedback-composer-title">
-    <div className="composer-header"><div><div className="eyebrow">{t("Your perspective matters")}</div><h2 id="feedback-composer-title">{t("Add feedback")}</h2></div><button type="button" className="icon-button" disabled={disabled} aria-label={t("Close feedback form")} onClick={close}><X size={20} /></button></div>
-    {result ? <div className="composer-body" role="status"><CheckCircle2 className="green-text" /><h3>{result === 'queued' ? t("Saved on this device") : t(visibility === 'private' ? 'Your feedback was sent to the team' : 'Your feedback is on the board')}</h3><p className="muted small-text">{result === 'queued' ? t("Your feedback and photos will send when the connection returns. Keep this device available until they send.") : t("Thank you for sharing your experience.")}</p><button type="button" className="button primary" onClick={onClose}>{t("Done")}</button></div> : <form className="composer-body" onSubmit={submit} noValidate>
+  return <section className="feedback-composer" role="dialog" aria-labelledby="feedback-composer-title" onKeyDown={event => { if (event.key === 'Escape' && !camera) { event.stopPropagation(); close(); } }}>
+    <div className="composer-header"><div><div className="eyebrow">{t("Your perspective matters")}</div><h2 id="feedback-composer-title">{t("Add feedback")}</h2><p className="composer-draft-hint">{t('Minimize to keep browsing. Your draft stays here.')}</p></div><div className="composer-window-actions">{onMinimize && <button type="button" className="icon-button" disabled={disabled || Boolean(camera)} aria-label={t('Minimize feedback')} title={t('Minimize feedback')} onClick={onMinimize}><Minus size={18} /></button>}<button type="button" className="icon-button" disabled={disabled} aria-label={t("Close feedback form")} onClick={close}><X size={20} /></button></div></div>
+    {result ? <div className="composer-body" role="status"><CheckCircle2 className="green-text" /><h3>{result === 'queued' ? t("Saved on this device") : t(visibility === 'private' ? 'Your feedback was sent to the team' : 'Your feedback is on the board')}</h3><p className="muted small-text">{result === 'queued' ? t("Your feedback and photos will send when the connection returns. Keep this device available until they send.") : t("Thank you for sharing your experience.")}</p><button type="button" className="button primary" onClick={onClose}>{t("Done")}</button></div> : <form id="feedback-entry" className="composer-body" onSubmit={submit} noValidate>
       <fieldset disabled={disabled} style={{ border: 0, padding: 0, margin: 0, minWidth: 0 }}>
         <label className="form-field"><span className="form-label">{t("Your feedback")} <span className="required">*</span></span><textarea ref={messageInput} className="text-area" rows={5} minLength={10} maxLength={2000} placeholder={t("What worked well? What could be better?")} value={message} aria-invalid={Boolean(errors.message)} aria-describedby="feedback-message-help" onChange={event => { setMessage(event.target.value); setErrors(previous => ({ ...previous, message: '' })); }} /><span id="feedback-message-help" className={errors.message ? "red-text small-text" : 'help-text'} role={errors.message ? 'alert' : undefined}>{errors.message ? t(errors.message) : t("{count} / 2,000 characters · at least 10 characters", { count: number(message.length) })}</span></label>
 
@@ -132,9 +141,10 @@ export default function FeedbackComposer({ kioskId, area, onClose, onPosted }: P
         {visibility === 'public' ? <><label className="choice-option"><input ref={consentInput} type="checkbox" checked={consent} aria-invalid={Boolean(errors.consent)} aria-describedby="feedback-consent-help" onChange={event => { setConsent(event.target.checked); setErrors(previous => ({ ...previous, consent: '' })); }} /><span>{t("I agree to post my feedback and photos on this public board.")}</span></label><p id="feedback-consent-help" className={errors.consent ? "red-text small-text" : 'help-text'} role={errors.consent ? 'alert' : undefined}>{errors.consent ? t(errors.consent) : t("Your feedback, photos and avatar will be visible to everyone. Contact details stay private.")}</p></> : <p className="help-text private-feedback-help"><LockKeyhole size={13} />{t('Only the team can see this feedback and its photos.')}</p>}
       </fieldset>
       {error && <p className="error-banner" role="alert">{t(error)}</p>}
-      {discard && <div className="composer-discard" role="alert"><p className="small-text">{t("Discard this feedback? Your text and photos will be cleared.")}</p><div className="row wrap"><button type="button" className="button small" onClick={() => setDiscard(false)}>{t("Keep editing")}</button><button type="button" className="button danger small" onClick={onClose}>{t("Discard feedback")}</button></div></div>}
-      <div className="composer-footer row between mt"><button type="button" className="button ghost" disabled={disabled} onClick={close}>{t("Cancel")}</button><button type="submit" className="button primary" disabled={disabled}><Send size={15} />{busy ? t('Sending…') : photoBusy ? t("Preparing photo…") : t(visibility === 'private' ? 'Send privately' : 'Post feedback')}</button></div>
+      {discard && <div ref={discardBox} className="composer-discard" role="alert"><p className="small-text">{t("Discard this feedback? Your text and photos will be cleared.")}</p><div className="row wrap"><button type="button" className="button small" onClick={() => setDiscard(false)}>{t("Keep editing")}</button><button type="button" className="button danger small" onClick={onClose}>{t("Discard feedback")}</button></div></div>}
+
     </form>}
+    {!result && <div className="composer-footer row between mt"><button type="button" className="button ghost" disabled={disabled} onClick={close}>{t("Cancel")}</button><button type="submit" form="feedback-entry" className="button primary" disabled={disabled}><Send size={15} />{busy ? t('Sending…') : photoBusy ? t("Preparing photo…") : t(visibility === 'private' ? 'Send privately' : 'Post feedback')}</button></div>}
     {camera && <CameraCapture selfie={camera === 'selfie'} onClose={() => setCamera(null)} onUse={file => { if (camera === 'selfie') setSelfie({ ...file, name: 'feedback-selfie.jpg' }); else setPhotos(previous => previous.length < 3 ? [...previous, { ...file, name: `feedback-${uid()}.jpg` }] : previous); setCamera(null); }} />}
   </section>;
 }
