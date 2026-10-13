@@ -15,6 +15,13 @@
       "when": 1791195385348,
       "tag": "0001_sleepy_roughhouse",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1791849600000,
+      "tag": "0002_experience_centre",
+      "breakpoints": true
     }
   ]
 }

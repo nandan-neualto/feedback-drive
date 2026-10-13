@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Feedbacks Drive",
-  "short_name": "Feedbacks Drive",
-  "description": "Share your experience and photos to help shape a better drive.",
+  "name": "Toyota Experience Centre Feedbacks",
+  "short_name": "Centre Feedbacks",
+  "description": "Share feedbacks and photos from your Toyota Experience Centre visit.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

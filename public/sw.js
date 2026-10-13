@@ -1,10 +1,10 @@
 /* Offline app shell only. Responses, photos, sessions and auth are never cached. */
-const VERSION = "feedback-drive-v10";
+const VERSION = "feedback-drive-v11";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const MAX_ASSETS = 80;
 const AUTH_PATHS = new Set(["/signin-with-chatgpt", "/signout-with-chatgpt", "/callback"]);
-const OFFLINE = "<!doctype html><html lang='en'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Feedback Drive — Offline</title><style>body{margin:0;background:#090b0e;color:#f1f2f4;font:18px system-ui;display:grid;min-height:100vh;place-content:center;padding:32px;max-width:540px;margin:auto}h1{font-size:32px}p{line-height:1.65}a{color:inherit}</style><h1>You're offline</h1><p>Connect to open Feedback Drive. Feedback already saved on this device will be available when you return.</p><a href='/'>Try again</a></html>";
+const OFFLINE = "<!doctype html><html lang='en'><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Toyota Experience Centre — Offline</title><style>body{margin:0;background:#090b0e;color:#f1f2f4;font:18px system-ui;display:grid;min-height:100vh;place-content:center;padding:32px;max-width:540px;margin:auto}h1{font-size:32px}p{line-height:1.65}a{color:inherit}</style><h1>You're offline</h1><p>Connect to open the Toyota Experience Centre feedbacks board. Feedback already saved on this device will be available when you return.</p><a href='/'>Try again</a></html>";
 
 function isImmutableAsset(url) {
   return url.origin === self.location.origin && (url.pathname.startsWith("/assets/") || url.pathname.startsWith("/_next/static/")) && /[.-][A-Za-z0-9_-]{8,}\.(js|css)$/.test(url.pathname) && !url.search;

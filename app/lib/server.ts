@@ -1,5 +1,6 @@
 import { env } from "cloudflare:workers";
 import { getChatGPTUser } from "../chatgpt-auth";
+import { isFeedbackCategory, normalizeFeedbackCategory } from './experience-centre.ts';
 
 export type Question = { id: string; label: string; type: "short" | "long" | "single" | "multiple" | "rating" | "yesno"; required: boolean; options?: string[] };
 export type Survey = { id: string; title: string; description: string; category: string; status: "active" | "draft" | "closed"; questions: Question[]; createdAt: string; responseCount: number; coverImage?: string; allowPhotos: boolean; requireName: boolean; showOnBoard: boolean; closesAt?: string };
@@ -139,13 +140,14 @@ function parseQuestions(value: unknown): Question[] {
   });
 }
 function asSurvey(row: SurveyRow): Survey {
-  return { id: row.id, title: row.title, description: row.description, category: row.category, status: row.status as Survey["status"], questions: JSON.parse(row.questions), createdAt: row.created_at, responseCount: row.response_count ?? 0, coverImage: row.cover_image ? fileUrl(row.cover_image) : undefined, allowPhotos: Boolean(row.allow_photos), requireName: Boolean(row.require_name), showOnBoard: Boolean(row.show_on_board), closesAt: row.closes_at ?? undefined };
+  return { id: row.id, title: row.title, description: row.description, category: isFeedbackCategory(row.category) ? normalizeFeedbackCategory(row.category) : row.category, status: row.status as Survey["status"], questions: JSON.parse(row.questions), createdAt: row.created_at, responseCount: row.response_count ?? 0, coverImage: row.cover_image ? fileUrl(row.cover_image) : undefined, allowPhotos: Boolean(row.allow_photos), requireName: Boolean(row.require_name), showOnBoard: Boolean(row.show_on_board), closesAt: row.closes_at ?? undefined };
 }
 async function surveyRow(id: string): Promise<SurveyRow> { const row = await db().prepare(`${selectSurvey} WHERE s.id = ? AND s.status != 'archived'`).bind(safeId(id)).first<SurveyRow>(); if (!row) throw new ApiError("Survey not found.", 404); return row; }
 function surveyInput(input: Record<string, unknown>, request: Request, existing?: SurveyRow) {
   const title = input.title === undefined && existing ? existing.title : text(input.title, "Survey title", 160, true);
   const description = input.description === undefined && existing ? existing.description : text(input.description, "Description", 2000);
-  const category = input.category === undefined && existing ? existing.category : text(input.category ?? "General", "Category", 80, true);
+  const categoryInput = input.category === undefined && existing ? existing.category : text(input.category ?? "General", "Category", 80, true);
+  const category = isFeedbackCategory(categoryInput) ? normalizeFeedbackCategory(categoryInput) : categoryInput;
   const status = input.status ?? existing?.status ?? "draft";
   if (!["active", "draft", "closed"].includes(String(status))) throw new ApiError("Choose active, draft, or closed status.");
   const questions = input.questions === undefined && existing ? JSON.parse(existing.questions) as Question[] : parseQuestions(input.questions);
@@ -212,7 +214,8 @@ function validateAnswers(input: unknown, questions: Question[]) {
 function asResponse(row: ResponseRow, publicView = false) {
   const photos = (JSON.parse(row.photos) as string[]).map(fileUrl);
   const avatar = fileKeyPattern.test(row.avatar) ? fileUrl(row.avatar) : row.avatar;
-  const common = { id: row.id, surveyId: row.survey_id, surveyTitle: row.survey_title ?? "", category: row.category ?? "General", name: publicView ? (row.name.trim() ? `${Array.from(row.name.trim())[0]}.` : "Anonymous") : row.name, avatar, answers: JSON.parse(row.answers), photos, questions: JSON.parse(row.questions_snapshot), status: row.status, featured: Boolean(row.featured), createdAt: row.created_at, kioskId: row.kiosk_id, area: row.area };
+  const category = row.category ?? "General";
+  const common = { id: row.id, surveyId: row.survey_id, surveyTitle: row.survey_title ?? "", category: isFeedbackCategory(category) ? normalizeFeedbackCategory(category) : category, name: publicView ? (row.name.trim() ? `${Array.from(row.name.trim())[0]}.` : "Anonymous") : row.name, avatar, answers: JSON.parse(row.answers), photos, questions: JSON.parse(row.questions_snapshot), status: row.status, featured: Boolean(row.featured), createdAt: row.created_at, kioskId: row.kiosk_id, area: row.area };
   return publicView ? common : { ...common, contact: row.contact, consent: Boolean(row.consent) };
 }
 export async function submitResponse(request: Request, surveyId: string) {

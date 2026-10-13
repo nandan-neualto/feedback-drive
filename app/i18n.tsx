@@ -7,6 +7,7 @@ import { managerCatalog } from './locales/manager';
 import { polishCatalog } from './locales/polish';
 import { toyotaCatalog } from './locales/toyota';
 import { feedbacksCatalog } from './locales/feedbacks';
+import { experienceCatalog } from './locales/experience';
 
 export type Language = 'en' | 'kn' | 'hi' | 'ja';
 export type Theme = 'light' | 'dark';
@@ -18,9 +19,9 @@ export const languages: { code: Language; label: string; locale: string }[] = [
   { code: 'ja', label: '日本語', locale: 'ja-JP' },
 ];
 const catalogs: TranslationCatalog = {
-  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn, ...polishCatalog.kn, ...toyotaCatalog.kn, ...feedbacksCatalog.kn },
-  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi, ...polishCatalog.hi, ...toyotaCatalog.hi, ...feedbacksCatalog.hi },
-  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja, ...polishCatalog.ja, ...toyotaCatalog.ja, ...feedbacksCatalog.ja },
+  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn, ...polishCatalog.kn, ...toyotaCatalog.kn, ...feedbacksCatalog.kn, ...experienceCatalog.kn },
+  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi, ...polishCatalog.hi, ...toyotaCatalog.hi, ...feedbacksCatalog.hi, ...experienceCatalog.hi },
+  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja, ...polishCatalog.ja, ...toyotaCatalog.ja, ...feedbacksCatalog.ja, ...experienceCatalog.ja },
 };
 const preferenceKey = 'fd-preferences';
 const preferenceEvent = 'feedback-preferences-updated';

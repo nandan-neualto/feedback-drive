@@ -1,0 +1,92 @@
+/* Visitor context and centre-team replies within the existing manager design. */
+.experience-manager .manager-toolbar {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 9px;
+}
+.experience-manager .manager-toolbar .board-search {
+  grid-column: span 2;
+  width: auto;
+  min-width: 0;
+}
+.experience-manager .manager-toolbar .select-input { width: 100%; min-width: 0; }
+.experience-manager .manager-toolbar > .button { justify-self: start; }
+.experience-manager .manager-table { min-width: 1190px; }
+.centre-reply-chip,
+.centre-sample-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  width: fit-content;
+  border: 1px solid var(--fd-border);
+  border-radius: 6px;
+  padding: 5px 7px;
+  color: var(--fd-text-secondary);
+  background: var(--fd-surface-soft);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+.centre-reply-chip { text-align: left; }
+.centre-reply-chip:hover { border-color: var(--fd-accent-border); color: var(--fd-accent); }
+.centre-reply-chip.replied { color: var(--fd-accent); background: var(--fd-accent-soft); border-color: var(--fd-accent-border); }
+.centre-sample-badge { margin-top: 5px; color: var(--fd-amber-text, var(--fd-text-secondary)); }
+.centre-visit-details {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin: 18px 0;
+  padding: 15px 17px;
+  border: 1px solid var(--fd-border);
+  border-radius: 10px;
+  background: var(--fd-background);
+}
+.centre-visit-details > span { display: grid; gap: 5px; font-size: 13px; color: var(--fd-text); }
+.centre-visit-details strong { font-size: 10px; font-weight: 600; color: var(--fd-text-secondary); }
+.centre-team-reply {
+  margin: 22px 0;
+  padding: 19px;
+  border: 1px solid var(--fd-accent-border);
+  border-radius: 12px;
+  background: var(--fd-accent-soft);
+}
+.centre-reply-heading { display: flex; align-items: start; gap: 11px; margin-bottom: 14px; }
+.centre-reply-heading > svg { flex-shrink: 0; color: var(--fd-accent); margin-top: 2px; }
+.centre-reply-heading h3 { font-size: 15px; font-weight: 650; margin: 0 0 5px; }
+.centre-reply-heading p { margin: 0; font-size: 12px; line-height: 1.6; color: var(--fd-text-secondary); }
+.centre-team-reply .text-input { width: 100%; min-height: 106px; resize: vertical; line-height: 1.7; background: var(--fd-surface); }
+.centre-reply-footer { display: flex; gap: 12px; justify-content: space-between; align-items: start; margin-top: 12px; }
+.centre-reply-footer .help-text { font-size: 10px; line-height: 1.7; }
+.centre-reply-footer > .row { justify-content: flex-end; }
+.centre-sample-note {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 12px 14px;
+  border: 1px solid var(--fd-border);
+  border-radius: 9px;
+  background: var(--fd-surface-soft);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--fd-text-secondary);
+}
+.centre-sample-note .centre-sample-badge { flex-shrink: 0; margin: 0; }
+.experience-manager .manager-insight-stats { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.centre-visit-insights { margin-top: 18px; }
+.centre-visit-counts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; padding: 17px; }
+.centre-visit-counts > div { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 12px; background: var(--fd-background); border-radius: 8px; font-size: 12px; }
+.centre-visit-counts strong { color: var(--fd-accent); font-size: 18px; }
+@media (max-width: 760px) {
+  .experience-manager .manager-toolbar { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .experience-manager .manager-toolbar .board-search { grid-column: 1 / -1; }
+  .experience-manager .manager-insight-stats,
+  .centre-visit-counts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .centre-reply-footer { flex-direction: column; }
+  .centre-reply-footer > .row { justify-content: flex-start; }
+  .centre-sample-note { align-items: start; flex-direction: column; }
+}
+@media (max-width: 390px) {
+  .centre-visit-details { grid-template-columns: 1fr; }
+  .centre-team-reply { padding: 15px; }
+}

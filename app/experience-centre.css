@@ -1,0 +1,48 @@
+@import './experience-composer.css';
+@import './experience-manager.css';
+
+/* The visitor board remains the main canvas for the experience centre. */
+.feedback-brand .brand-name { max-width: 190px; line-height: 1.35; }
+.feedback-brand .brand-name span { letter-spacing: 1.6px; }
+.board-heading .wall-eyebrow { letter-spacing: 1.2px; }
+.centre-sample-notice { display: flex; align-items: center; gap: 11px; padding: 10px 14px; margin: -4px 0 16px; border: 1px solid var(--fd-border); border-radius: 10px; color: var(--fd-muted); background: var(--fd-surface); font-size: 11px; }
+.centre-sample-notice > svg { flex-shrink: 0; color: var(--fd-accent); }
+.centre-sample-notice > div { display: flex; align-items: baseline; gap: 12px; flex: 1; }
+.centre-sample-notice strong { color: var(--fd-text-secondary); font-size: 11px; font-weight: 600; white-space: nowrap; }
+.centre-sample-notice .button { flex-shrink: 0; font-size: 11px; }
+.sample-feedback-label { display: inline-block; margin-top: 4px; padding: 2px 6px; border: 1px solid var(--fd-border); border-radius: 4px; font-size: 10px; color: var(--fd-muted); line-height: 1.4; }
+.wall-card .feedback-card-meta { flex-wrap: wrap; }
+.wall-card .feedback-card-meta .wall-category { max-width: 100%; line-height: 1.5; }
+.wall-category[data-category='Exhibits']::before { background: #9181bb; }
+.wall-category[data-category='Guided tours']::before { background: #729eaf; }
+.wall-category[data-category='Interactive activities']::before { background: #b09763; }
+.wall-category[data-category='Visitor support']::before { background: #7d9b82; }
+.wall-category[data-category='Facilities & accessibility']::before { background: #b08078; }
+.wall-category[data-category='Overall visit']::before { background: #84978c; }
+.centre-visit-context { display: flex; align-items: flex-start; gap: 6px; padding: 0 20px 14px; color: var(--fd-muted); font-size: 11px; line-height: 1.6; }
+.centre-visit-context svg { flex-shrink: 0; margin-top: 3px; }
+.centre-reply-link { display: flex; align-items: center; gap: 7px; margin: 0 14px 14px; padding: 9px 10px; min-height: 36px; width: calc(100% - 28px); border: 1px solid var(--fd-green-border); border-radius: 7px; background: var(--fd-green-soft); color: var(--fd-green); font-size: 11px; text-align: left; cursor: pointer; }
+.centre-reply-link svg { flex-shrink: 0; }
+.centre-reply-link svg:last-child { margin-left: auto; }
+.centre-reply-link:hover { border-color: var(--fd-green); }
+.wall-card .centre-team-reply { margin: 0 0 20px; border: 1px solid var(--fd-green-border); border-radius: 12px; padding: 18px; background: var(--fd-green-soft); }
+.wall-card .centre-team-reply > span { display: flex; align-items: center; gap: 8px; color: var(--fd-green); font-size: 12px; font-weight: 600; }
+.wall-card .centre-team-reply p { font-size: 14px; line-height: 1.8; color: var(--fd-text-secondary); white-space: pre-wrap; overflow-wrap: anywhere; margin: 12px 0 0; }
+.wall-card .centre-team-reply time { display: block; margin-top: 12px; color: var(--fd-muted); font-size: 11px; }
+.feedback-app .modal .wall-card-full .centre-visit-context { padding: 0 0 20px; }
+.board-mode .centre-sample-notice { margin-top: 0; }
+@media(max-width:760px) {
+  .centre-sample-notice { align-items: flex-start; gap: 9px; padding: 12px; }
+  .centre-sample-notice > div { display: block; line-height: 1.6; }
+  .centre-sample-notice strong { display: block; margin-bottom: 3px; }
+  .centre-sample-notice .button { min-height: 44px; padding: 8px; max-width: 108px; white-space: normal; }
+  .centre-reply-link { min-height: 44px; font-size: 12px; }
+}
+@media(max-width:650px) {
+  .feedback-brand .brand-name { max-width: 160px; font-size: 14px; }
+  .board-heading .board-title { font-size: 32px; }
+  .centre-sample-notice { flex-wrap: wrap; }
+  .centre-sample-notice > div { flex: 1; }
+  .centre-sample-notice .button { flex-basis: 100%; justify-content: flex-start; padding-left: 26px; max-width: none; min-height: 44px; }
+  .wall-card .centre-team-reply { padding: 16px; }
+}

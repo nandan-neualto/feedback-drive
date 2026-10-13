@@ -5,12 +5,13 @@ import "./feedback-minimal.css";
 import "./feedback-polish.css";
 import "./toyota-theme.css";
 import "./feedback-design.css";
+import "./experience-centre.css";
 import PreferencesProvider from "./i18n";
 import { preferenceBootstrap } from "./preferences-script";
 
 export const metadata: Metadata = {
-  title: "Feedbacks Drive | Your experience matters",
-  description: "A live feedbacks board. Share experiences and photos, report concerns, and follow the team’s progress.",
+  title: "Toyota Experience Centre | Visitor feedbacks",
+  description: "Share feedbacks and photos from your Toyota Experience Centre visit, explore visitor experiences, and follow the centre team’s responses.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/favicon.svg",

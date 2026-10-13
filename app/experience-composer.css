@@ -1,0 +1,72 @@
+.feedback-composer .experience-visit-rating,
+.feedback-composer .experience-visit-context {
+  min-width: 0;
+  border: 0;
+  margin: 0 0 20px;
+  padding: 0;
+}
+
+.feedback-composer .experience-rating-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.feedback-composer .experience-rating-controls .composer-stars {
+  margin: 0;
+  gap: 6px;
+}
+
+.feedback-composer .experience-rating-controls .icon-button {
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+}
+
+.feedback-composer .experience-rating-controls .experience-rating-clear {
+  min-height: 44px;
+  padding-inline: 10px;
+}
+
+.feedback-composer .experience-visit-context {
+  padding: 15px;
+  border: 1px solid var(--fd-border);
+  border-radius: 12px;
+  background: var(--fd-surface-soft);
+}
+
+.feedback-composer .experience-visit-context > legend {
+  padding-inline: 5px;
+  margin-inline: -5px;
+}
+
+.feedback-composer .experience-visit-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.feedback-composer .experience-visit-fields .select-input {
+  min-height: 44px;
+  min-width: 0;
+  max-width: 100%;
+  background-color: var(--fd-surface);
+  font-size: 12px;
+}
+
+.feedback-composer .experience-visit-context .help-text {
+  margin-top: 10px;
+}
+
+@media (max-width: 480px) {
+  .feedback-composer .experience-visit-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .feedback-composer .experience-visit-context {
+    padding: 12px;
+  }
+}
