@@ -8,8 +8,8 @@ import PreferencesProvider from "./i18n";
 import { preferenceBootstrap } from "./preferences-script";
 
 export const metadata: Metadata = {
-  title: "Feedback Drive | Ideas in motion",
-  description: "A live feedback board. Share what you think, add photos, and see the conversation move forward.",
+  title: "Feedbacks Drive | Your experience matters",
+  description: "A live feedbacks board. Share experiences and photos, report concerns, and follow the team’s progress.",
   manifest: "/manifest.webmanifest",
   icons: {
     icon: "/favicon.svg",

@@ -3,6 +3,7 @@ import {
   json, noCache, now, payload, rateLimit, respectfulText, safeId, sameOrigin,
   text, validateContact, type UploadRow,
 } from "./server";
+import { selectManagerFeedback } from "./manager-feedback";
 
 export type FeedbackStatus = "new" | "reviewed" | "shortlisted" | "adopted" | "hidden";
 export type FeedbackItem = {
@@ -151,14 +152,19 @@ export async function archiveFeedback(request: Request, id: string) {
 
 export async function exportFeedback(request: Request) {
   await admin(request);
-  const filters = feedbackFilters(request, true);
-  const result = await db().prepare(`SELECT * FROM feedback${filters.sql} ORDER BY created_at DESC LIMIT 10000`).bind(...filters.values).all<FeedbackRow>();
+  const params = new URL(request.url).searchParams;
+  feedbackFilters(request, true); // Preserve category/status validation.
+  const visibility = params.get('visibility') || 'all';
+  if (!['all', 'public', 'private'].includes(visibility)) throw new ApiError('Choose a valid feedback visibility.');
+  const result = await db().prepare('SELECT * FROM feedback ORDER BY created_at DESC LIMIT 10000').all<FeedbackRow>();
+  const selected = selectManagerFeedback(result.results.map(row => asFeedback(row)), { category: params.get('category') || 'all', status: params.get('status') || 'all', area: params.get('area') || 'all', search: params.get('search') || '', visibility });
+  const ids = new Set(selected.map(item => item.id));
   const header = ["Feedback ID", "Title", "Feedback", "Suggested improvement", "Rating", "Category", "Name", "Contact", "Submitted at", "Status", "Published", "Public board consent", "Kiosk", "Area", "Photos", "Avatar"];
   const lines = [header.map(csvCell).join(",")];
-  for (const row of result.results) lines.push([
+  for (const row of result.results.filter(row => ids.has(row.id))) lines.push([
     row.id, row.title, row.message, row.suggestion, row.rating, row.category, row.name, row.contact,
-    row.created_at, row.status, Boolean(row.published), Boolean(row.consent), row.kiosk_id, row.area,
+    row.created_at, ({ new: "Received", reviewed: "In review", shortlisted: "Action planned", adopted: "Completed", hidden: "Archived" } as const)[row.status], Boolean(row.published), Boolean(row.consent), row.kiosk_id, row.area,
     (JSON.parse(row.photos) as string[]).map(fileUrl), fileKeyPattern.test(row.avatar) ? fileUrl(row.avatar) : row.avatar,
   ].map(csvCell).join(","));
-  return new Response(`\uFEFF${lines.join("\r\n")}\r\n`, { headers: { ...noCache, "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="feedback-${now().slice(0, 10)}.csv"` } });
+  return new Response(`\uFEFF${lines.join("\r\n")}\r\n`, { headers: { ...noCache, "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="feedbacks-${now().slice(0, 10)}.csv"` } });
 }

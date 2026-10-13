@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Feedback Drive",
-  "short_name": "Feedback Drive",
+  "name": "Feedbacks Drive",
+  "short_name": "Feedbacks Drive",
   "description": "Share your experience and photos to help shape a better drive.",
   "start_url": "/",
   "scope": "/",

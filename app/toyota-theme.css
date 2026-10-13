@@ -251,3 +251,23 @@ html[lang="kn"] .board-title,html[lang="hi"] .board-title { line-height:1.4; let
 /* The submit controls sit outside the scrollable form, so they cannot cover fields. */
 .feedback-dock .composer-footer { position:static; flex-shrink:0; margin:0; padding:13px 20px; }
 @media(max-width:760px) { .feedback-dock .composer-footer { margin:0; padding:12px 16px; } }
+
+/* Feedbacks: a clear path from experience to follow-up. */
+.feedback-progress { margin:18px 0 0; padding:18px; background:var(--fd-background); border:1px solid var(--fd-border); border-radius:12px; }
+.feedback-progress-heading { display:flex; gap:12px; justify-content:space-between; align-items:center; font-size:12px; }
+.feedback-progress-heading > span { color:var(--fd-accent); font-size:11px; }
+.feedback-progress ol { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); list-style:none; padding:0; margin:18px 0 12px; }
+.feedback-progress li { display:flex; flex-direction:column; gap:8px; position:relative; color:var(--fd-muted); font-size:10px; padding-right:8px; }
+.feedback-progress li:not(:last-child)::after { content:''; position:absolute; height:2px; left:24px; right:2px; top:10px; background:var(--fd-border); }
+.feedback-progress li.reached:not([aria-current]):not(:last-child)::after { background:var(--fd-accent); opacity:.45; }
+.feedback-progress li.reached { color:var(--fd-accent); }
+.progress-node { width:22px; height:22px; border:1px solid var(--fd-border); border-radius:50%; display:grid; place-items:center; }
+.reached .progress-node { border-color:var(--fd-accent); background:var(--fd-accent-soft); }
+.feedback-progress p { margin:0; color:var(--fd-muted); font-size:12px; line-height:1.6; }
+.manager-toolbar { flex-wrap:wrap; }
+.manager-toolbar .board-search { min-width:220px; }
+.manager-toolbar select { flex:1 1 140px; min-width:0; }
+@media(max-width:650px) { .feedback-progress { padding:14px; }.manager-toolbar .board-search { min-width:0; width:100%; flex-basis:100%; } }
+
+.wall-location { display:flex; gap:16px; flex-wrap:wrap; justify-content:space-between; }
+.feedback-progress li { min-width:0; }.feedback-progress li > span:last-child { overflow-wrap:anywhere; line-height:1.6; }

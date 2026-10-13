@@ -54,7 +54,7 @@ export default function Builder({ survey, onClose, onSaved }: Props) {
     });
   }
   function validate(status: Survey['status']): LocalMessage {
-    if (!draft.title.trim()) return 'Give your survey a title.';
+    if (!draft.title.trim()) return "Give your feedback form a title.";
     if (draft.title.trim().length > 160) return 'The title must be 160 characters or fewer.';
     if (draft.description.trim().length > 2000) return 'The introduction must be 2,000 characters or fewer.';
     if (!draft.questions.length || draft.questions.length > 20) return 'Add between 1 and 20 questions.';
@@ -84,7 +84,7 @@ export default function Builder({ survey, onClose, onSaved }: Props) {
     try {
       const prepared = await processImage(file);
       const form = new FormData();
-      form.append('file', prepared, 'survey-cover.jpg'); form.append('purpose', 'cover');
+      form.append('file', prepared, "survey-cover.jpg"); form.append('purpose', 'cover');
       const result = await readReply(await fetch('/api/uploads', { method: 'POST', body: form, signal: AbortSignal.timeout(45000) }));
       if (!result.key && !result.url) throw new Error('The cover image could not be uploaded. Please try again.');
       patch({ coverImage: result.key || result.url });
@@ -106,9 +106,9 @@ export default function Builder({ survey, onClose, onSaved }: Props) {
       });
       const payload = { title: draft.title.trim(), description: draft.description.trim(), category: draft.category, status, questions, allowPhotos: draft.allowPhotos, requireName: draft.requireName, showOnBoard: draft.showOnBoard, coverImage: draft.coverImage || '', closesAt: closing ? new Date(closing).toISOString() : '' };
       const result = await readReply(await fetch(survey.id ? `/api/surveys/${encodeURIComponent(survey.id)}` : '/api/surveys', { ...json(payload, survey.id ? 'PATCH' : 'POST'), signal: AbortSignal.timeout(30000) }));
-      if (!result.survey?.id) throw new Error('The server did not confirm your survey. Please try saving again.');
+      if (!result.survey?.id) throw new Error("The server did not confirm your feedback form. Please try saving again.");
       onSaved(result.survey);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Your survey could not be saved. Please try again.'); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "Your feedback form could not be saved. Please try again."); }
     finally { busyRef.current = false; setBusy(false); }
   }
 
@@ -118,21 +118,21 @@ export default function Builder({ survey, onClose, onSaved }: Props) {
     try {
       await readReply(await fetch(`/api/surveys/${encodeURIComponent(survey.id)}`, { method: 'DELETE', signal: AbortSignal.timeout(30000) }));
       onSaved(undefined, true);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'This survey could not be archived. Please try again.'); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : "This feedback form could not be archived. Please try again."); }
     finally { busyRef.current = false; setBusy(false); }
   }
 
-  return <Modal title={t(survey.id ? 'Edit survey' : 'Create a survey')} onClose={close} wide>
-    <div className="builder-intro"><span className="eyebrow">{t("Survey studio")}</span><p className="muted">{t("Ask the right questions. Make every response count.")}</p></div>
+  return <Modal title={t(survey.id ? "Edit feedback form" : "Create a feedback form")} onClose={close} wide>
+    <div className="builder-intro"><span className="eyebrow">{t("Feedback form studio")}</span><p className="muted">{t("Ask the right questions. Make every response count.")}</p></div>
     {error && <div className="error-banner" role="alert">{typeof error === 'string' ? t(error) : t(error.key, error.vars)}</div>}
     <fieldset className="builder-fieldset" disabled={busy || uploading}>
       <div className="form-grid">
-        <label className="form-field full"><span className="form-label">{t("Survey title")} <span className="required">*</span></span><input className="text-input" value={draft.title} maxLength={160} placeholder={t("e.g. Help shape the next drive")} onChange={e => patch({ title: e.target.value })} autoFocus /></label>
+        <label className="form-field full"><span className="form-label">{t("Feedback form title")} <span className="required">*</span></span><input className="text-input" value={draft.title} maxLength={160} placeholder={t("e.g. Help shape the next drive")} onChange={e => patch({ title: e.target.value })} autoFocus /></label>
         <label className="form-field full"><span className="form-label">{t("Introduction")}</span><textarea className="text-area" value={draft.description} maxLength={2000} placeholder={t("Let people know what you want to learn and why their feedback matters.")} onChange={e => patch({ description: e.target.value })} /></label>
         <label className="form-field"><span className="form-label">{t("Category")}</span><select className="select-input" value={draft.category} onChange={e => patch({ category: e.target.value })}>{categories.map(category => <option key={category} value={category}>{categoryLabel(category)}</option>)}{!categories.includes(draft.category) && <option value={draft.category}>{draft.category}</option>}</select></label>
-        <label className="form-field"><span className="form-label">{t("Closing date")} <span className="muted">{t("(optional)")}</span></span><input className="text-input" type="datetime-local" value={closing} onChange={e => setClosing(e.target.value)} /><span className="help-text">{t("Your local time. Leave empty to keep the survey open.")}</span></label>
+        <label className="form-field"><span className="form-label">{t("Closing date")} <span className="muted">{t("(optional)")}</span></span><input className="text-input" type="datetime-local" value={closing} onChange={e => setClosing(e.target.value)} /><span className="help-text">{t("Your local time. Leave empty to keep the feedback form open.")}</span></label>
         <div className="form-field full"><span className="form-label">{t("Cover image")} <span className="muted">{t("(optional)")}</span></span>
-          {draft.coverImage ? <div className="cover-preview"><img src={fileUrl(draft.coverImage)} alt={t("Survey cover preview")} /><div className="cover-actions"><button type="button" className="button small secondary" onClick={() => fileInput.current?.click()}><ImagePlus />{t("Replace")}</button><button type="button" className="icon-button danger" aria-label={t("Remove cover image")} onClick={() => patch({ coverImage: '' })}><X /></button></div></div> : <button className="photo-upload cover-upload" type="button" onClick={() => fileInput.current?.click()}><Camera /><strong>{t("Add a cover image")}</strong><small>{t("JPG, PNG, or WebP · Up to 5 MB")}</small></button>}
+          {draft.coverImage ? <div className="cover-preview"><img src={fileUrl(draft.coverImage)} alt={t("Feedback form cover preview")} /><div className="cover-actions"><button type="button" className="button small secondary" onClick={() => fileInput.current?.click()}><ImagePlus />{t("Replace")}</button><button type="button" className="icon-button danger" aria-label={t("Remove cover image")} onClick={() => patch({ coverImage: '' })}><X /></button></div></div> : <button className="photo-upload cover-upload" type="button" onClick={() => fileInput.current?.click()}><Camera /><strong>{t("Add a cover image")}</strong><small>{t("JPG, PNG, or WebP · Up to 5 MB")}</small></button>}
           <input ref={fileInput} className="sr-only" tabIndex={-1} type="file" accept="image/jpeg,image/png,image/webp" onChange={e => void uploadCover(e.target.files?.[0])} />
         </div>
       </div>
@@ -157,10 +157,10 @@ export default function Builder({ survey, onClose, onSaved }: Props) {
       <label className="toggle-row"><div><strong>{t("Public response board")}</strong><p>{t("Allow approved responses with consent to appear on the board.")}</p></div><input type="checkbox" checked={draft.showOnBoard} onChange={e => patch({ showOnBoard: e.target.checked })} /></label>
     </fieldset>
     {uploading && <p className="upload-status" role="status"><LoaderCircle size={15} />{t("Preparing and uploading your cover…")}</p>}
-    {confirmArchive ? <div className="archive-confirm"><h3>{t("Archive this survey?")}</h3><p>{t("It will stop accepting responses and disappear from the public board. Existing responses stay in your dashboard.")}</p><div className="row"><button className="button secondary" disabled={busy} onClick={() => setConfirmArchive(false)}>{t("Keep survey")}</button><button className="button danger" disabled={busy} onClick={() => void archive()}>{busy ? <LoaderCircle /> : <Trash2 />}{t("Archive survey")}</button></div></div> : <div className="builder-footer">
-      <div className="row">{survey.id && <button className="button ghost small" disabled={busy || uploading} onClick={() => setConfirmArchive(true)}><Trash2 />{t("Archive")}</button>}{survey.id && survey.status === 'active' && <button className="button ghost small" disabled={busy || uploading} onClick={() => void save('closed')}>{t("Close survey")}</button>}</div>
-      <div className="row"><button className="button secondary" disabled={busy || uploading} onClick={() => void save('draft')}><Save />{t("Save draft")}</button><button className="button primary" disabled={busy || uploading} onClick={() => void save(survey.status === 'closed' ? 'closed' : 'active')}>{busy ? <LoaderCircle /> : <Check />}{t(survey.status === 'active' ? 'Save changes' : survey.status === 'closed' ? 'Save closed survey' : 'Publish survey')}<ChevronRight /></button></div>
-      {survey.status === 'closed' && <button className="button ghost small reopen-survey" disabled={busy || uploading} onClick={() => void save('active')}>{t("Reopen this survey")}</button>}
+    {confirmArchive ? <div className="archive-confirm"><h3>{t("Archive this feedback form?")}</h3><p>{t("It will stop accepting responses and disappear from the public board. Existing responses stay in your dashboard.")}</p><div className="row"><button className="button secondary" disabled={busy} onClick={() => setConfirmArchive(false)}>{t("Keep feedback form")}</button><button className="button danger" disabled={busy} onClick={() => void archive()}>{busy ? <LoaderCircle /> : <Trash2 />}{t("Archive feedback form")}</button></div></div> : <div className="builder-footer">
+      <div className="row">{survey.id && <button className="button ghost small" disabled={busy || uploading} onClick={() => setConfirmArchive(true)}><Trash2 />{t("Archive")}</button>}{survey.id && survey.status === 'active' && <button className="button ghost small" disabled={busy || uploading} onClick={() => void save('closed')}>{t("Close feedback form")}</button>}</div>
+      <div className="row"><button className="button secondary" disabled={busy || uploading} onClick={() => void save('draft')}><Save />{t("Save draft")}</button><button className="button primary" disabled={busy || uploading} onClick={() => void save(survey.status === 'closed' ? 'closed' : 'active')}>{busy ? <LoaderCircle /> : <Check />}{t(survey.status === 'active' ? 'Save changes' : survey.status === 'closed' ? "Save closed feedback form" : "Publish feedback form")}<ChevronRight /></button></div>
+      {survey.status === 'closed' && <button className="button ghost small reopen-survey" disabled={busy || uploading} onClick={() => void save('active')}>{t("Reopen this feedback form")}</button>}
     </div>}
   </Modal>;
 }

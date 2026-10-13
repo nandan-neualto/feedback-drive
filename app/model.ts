@@ -6,7 +6,7 @@ export type FeedbackPayload = { name: string; contact: string; avatar: string; c
 export const categories = ['Safety', 'Quality', 'Design', 'Sport', 'Service', 'EV', 'Infotainment', 'Others'];
 export const colors: Record<string, string> = { Safety: '#e96c6e', Quality: '#82b1e9', Design: '#9b91d9', Sport: '#e6a669', Service: '#7eb9a3', EV: '#a9bb77', Infotainment: '#cd94b9', Others: '#959eae' };
 export const avatars = [{ id: 'default', icon: '🚗' }, { id: 'smile', icon: '🙂' }, { id: 'leaf', icon: '🌿' }, { id: 'sun', icon: '☀️' }, { id: 'heart', icon: '❤️' }, { id: 'star', icon: '⭐' }, { id: 'flower', icon: '🌻' }, { id: 'spark', icon: '✨' }, { id: 'wave', icon: '🌊' }, { id: 'mountain', icon: '⛰️' }];
-export const statuses: Record<string, string> = { new: 'New', reviewed: 'In review', shortlisted: 'Shortlisted', adopted: 'Adopted', hidden: 'Archived' };
+export const statuses: Record<string, string> = { new: "Received", reviewed: 'In review', shortlisted: "Action planned", adopted: "Completed", hidden: 'Archived' };
 export const json = (data: unknown, method = 'POST') => ({ method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
 export const uid = () => crypto.randomUUID();
 export const fileUrl = (key?: string) => !key ? '' : /^[a-f0-9]{64}$/.test(key) ? `/api/files/${key}` : key;

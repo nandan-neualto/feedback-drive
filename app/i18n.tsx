@@ -6,6 +6,7 @@ import { composerCatalog } from './locales/composer';
 import { managerCatalog } from './locales/manager';
 import { polishCatalog } from './locales/polish';
 import { toyotaCatalog } from './locales/toyota';
+import { feedbacksCatalog } from './locales/feedbacks';
 
 export type Language = 'en' | 'kn' | 'hi' | 'ja';
 export type Theme = 'light' | 'dark';
@@ -17,9 +18,9 @@ export const languages: { code: Language; label: string; locale: string }[] = [
   { code: 'ja', label: '日本語', locale: 'ja-JP' },
 ];
 const catalogs: TranslationCatalog = {
-  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn, ...polishCatalog.kn, ...toyotaCatalog.kn },
-  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi, ...polishCatalog.hi, ...toyotaCatalog.hi },
-  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja, ...polishCatalog.ja, ...toyotaCatalog.ja },
+  kn: { ...publicCatalog.kn, ...composerCatalog.kn, ...managerCatalog.kn, ...polishCatalog.kn, ...toyotaCatalog.kn, ...feedbacksCatalog.kn },
+  hi: { ...publicCatalog.hi, ...composerCatalog.hi, ...managerCatalog.hi, ...polishCatalog.hi, ...toyotaCatalog.hi, ...feedbacksCatalog.hi },
+  ja: { ...publicCatalog.ja, ...composerCatalog.ja, ...managerCatalog.ja, ...polishCatalog.ja, ...toyotaCatalog.ja, ...feedbacksCatalog.ja },
 };
 const preferenceKey = 'fd-preferences';
 const preferenceEvent = 'feedback-preferences-updated';
@@ -80,7 +81,7 @@ export default function PreferencesProvider({ children }: { children: ReactNode 
     setTheme: next => { if (isTheme(next)) savePreference({ theme: next }); },
     toggleTheme: () => savePreference({ theme: theme === 'dark' ? 'light' : 'dark' }),
     categoryLabel: category => t(category),
-    statusLabel: status => t(({ new: 'New', reviewed: 'In review', shortlisted: 'Shortlisted', adopted: 'Adopted', hidden: 'Archived', active: 'Open', draft: 'Draft', closed: 'Closed' } as Record<string, string>)[status] || status),
+    statusLabel: status => t(({ new: "Received", reviewed: 'In review', shortlisted: "Action planned", adopted: "Completed", hidden: 'Archived', active: 'Open', draft: 'Draft', closed: 'Closed' } as Record<string, string>)[status] || status),
     formatDate: date => { if (!date) return ''; const parsed = new Date(date); return Number.isNaN(parsed.getTime()) ? '' : new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }).format(parsed); },
     number: (count, options) => new Intl.NumberFormat(locale, options).format(count),
   };

@@ -13,8 +13,8 @@ export function selectFeedback(items: FeedbackItem[], filters: BoardFilters): Fe
     if (filters.category !== 'All' && item.category !== filters.category) return false;
     if (filters.photosOnly && !item.photos.length) return false;
     if (filters.savedOnly && !saved.has(item.id)) return false;
-    // Search only public fields. Contact information and request IDs never enter the index.
-    const haystack = normalize([item.message, item.title, item.suggestion, item.publicName || item.name, item.area].filter(Boolean).join(' '));
+    // Search only public fields. Contact information and submission request IDs never enter the index.
+    const haystack = normalize([item.id, item.message, item.title, item.suggestion, item.publicName || item.name, item.area].filter(Boolean).join(' '));
     return words.every(word => haystack.includes(word));
   }).sort((a, b) => {
     const newest = Date.parse(b.createdAt) - Date.parse(a.createdAt);
