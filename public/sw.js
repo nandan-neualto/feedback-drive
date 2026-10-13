@@ -1,5 +1,5 @@
 /* Offline app shell only. Responses, photos, sessions and auth are never cached. */
-const VERSION = "feedback-drive-v9";
+const VERSION = "feedback-drive-v10";
 const SHELL_CACHE = `${VERSION}-shell`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const MAX_ASSETS = 80;

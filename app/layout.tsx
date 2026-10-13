@@ -4,6 +4,7 @@ import "./feedback-overhaul.css";
 import "./feedback-minimal.css";
 import "./feedback-polish.css";
 import "./toyota-theme.css";
+import "./feedback-design.css";
 import PreferencesProvider from "./i18n";
 import { preferenceBootstrap } from "./preferences-script";
 

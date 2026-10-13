@@ -1,0 +1,507 @@
+/* VibeCurb visual redesign: additive panel styles only.
+   Dialog state, data attributes, visibility and DOM structure stay untouched. */
+
+.manager-overlay {
+  padding: 28px;
+  background: var(--fd-backdrop);
+  backdrop-filter: blur(8px);
+}
+
+.manager-board {
+  max-width: 1480px;
+  max-height: calc(100dvh - 56px);
+  border: 1px solid var(--fd-border-strong);
+  border-radius: 18px;
+  background: var(--fd-surface);
+  box-shadow: 0 24px 80px #11131826;
+}
+
+.manager-board .manager-header {
+  padding: 28px 32px 26px;
+  border-bottom: 1px solid var(--fd-border);
+  background: var(--fd-surface);
+}
+
+.manager-board .manager-header::after { content: none; }
+.manager-board .manager-header h2 {
+  margin-bottom: 9px;
+  font-family: var(--fd-display-font);
+  font-size: clamp(25px, 2.2vw, 32px);
+  font-weight: 650;
+  line-height: 1.15;
+  letter-spacing: -.035em;
+  color: var(--fd-text);
+  text-wrap: balance;
+}
+.manager-board .manager-header h2 span { color: var(--fd-accent); }
+.manager-board .manager-header .board-eyebrow {
+  margin-bottom: 13px;
+  color: var(--fd-accent);
+  font-size: 10px;
+  line-height: 1.6;
+  letter-spacing: .12em;
+}
+.manager-board .manager-header p {
+  color: var(--fd-muted);
+  font-size: 12px;
+  line-height: 1.65;
+}
+.manager-board .manager-header :is(.icon-button, .button.ghost) {
+  border-color: var(--fd-border);
+  background: transparent;
+  color: var(--fd-text-secondary);
+}
+.manager-board .manager-header :is(.icon-button, .button.ghost):hover {
+  background: var(--fd-surface-soft);
+  color: var(--fd-text);
+}
+
+.manager-board .manager-tabs {
+  gap: 28px;
+  padding-inline: 32px;
+  border-color: var(--fd-border);
+  background: var(--fd-surface);
+}
+.manager-board .manager-tab {
+  min-height: 56px;
+  padding-inline: 2px;
+  color: var(--fd-muted);
+  font-size: 13px;
+  font-weight: 600;
+  transition: color 180ms cubic-bezier(.22, 1, .36, 1);
+}
+.manager-board .manager-tab:hover { color: var(--fd-text); }
+.manager-board .manager-tab.active,
+.manager-board .manager-tab.active svg { color: var(--fd-accent); }
+.manager-board .manager-tab.active::after {
+  height: 2px;
+  background: var(--fd-accent);
+}
+
+.manager-board .manager-content {
+  padding: 28px 32px 32px;
+  background: var(--fd-background);
+  scrollbar-gutter: stable;
+}
+.manager-board .manager-kpis { gap: 16px; margin-bottom: 24px; }
+.manager-board .manager-kpi {
+  position: relative;
+  min-height: 124px;
+  gap: 18px;
+  padding: 22px 24px;
+  border: 1px solid var(--fd-border);
+  border-radius: 14px;
+  background: var(--fd-surface);
+  color: var(--fd-muted);
+  box-shadow: none;
+  transition: border-color 200ms cubic-bezier(.22, 1, .36, 1), box-shadow 200ms cubic-bezier(.22, 1, .36, 1);
+}
+.manager-board .manager-kpi > span { font-size: 12px; line-height: 1.5; }
+.manager-board .manager-kpi > span svg { color: var(--fd-faint); }
+.manager-board .manager-kpi strong {
+  color: var(--fd-text);
+  font-family: var(--fd-display-font);
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -.05em;
+  font-variant-numeric: tabular-nums;
+}
+.manager-board .manager-kpi.active {
+  border-color: var(--fd-accent);
+  background: var(--fd-surface);
+  box-shadow: inset 0 3px 0 var(--fd-accent);
+}
+.manager-board .manager-kpi.active > span,
+.manager-board .manager-kpi.active > span svg { color: var(--fd-accent); }
+.manager-board .manager-kpi:hover { border-color: var(--fd-border-strong); }
+.manager-board .manager-kpi.active:hover { border-color: var(--fd-accent); }
+
+.manager-board .manager-review-strip {
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  gap: 24px;
+  border-color: var(--fd-border);
+  border-radius: 14px;
+  background: var(--fd-surface);
+}
+.manager-board .manager-review-icon {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--fd-border);
+  border-radius: 12px;
+  background: var(--fd-surface-soft);
+  color: var(--fd-accent);
+}
+.manager-board .manager-review-icon.complete {
+  border-color: var(--fd-green-border);
+  background: var(--fd-green-soft);
+  color: var(--fd-green);
+}
+.manager-board .manager-review-copy h3 {
+  font-family: var(--fd-display-font);
+  font-size: 15px;
+  letter-spacing: -.02em;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.manager-board .manager-review-copy p { font-size: 13px; line-height: 1.65; }
+.manager-board .manager-review-actions { align-items: center; }
+.manager-board .manager-toolbar { gap: 10px; margin-bottom: 24px; }
+.manager-board .manager-toolbar .board-search {
+  flex: 2 1 270px;
+  min-height: 44px;
+  border: 1px solid var(--fd-border-strong);
+  border-radius: 10px;
+  background: var(--fd-input);
+}
+.manager-board .manager-toolbar .board-search input {
+  padding-block: 12px;
+  color: var(--fd-text);
+  font-size: 13px;
+}
+.manager-board .manager-toolbar .board-search input::placeholder { color: var(--fd-muted); }
+.manager-board .manager-toolbar .board-search:focus-within {
+  border-color: var(--fd-accent);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--fd-accent-soft);
+}
+.manager-board .manager-toolbar .select-input {
+  flex: 1 1 145px;
+  min-width: 0;
+  max-width: 260px;
+  min-height: 44px;
+  padding: 11px 30px 11px 12px;
+  font-size: 13px;
+  border-radius: 10px;
+}
+
+.manager-board .manager-content .panel,
+.manager-board :is(.manager-form-card, .template-card, .manager-station) {
+  border-color: var(--fd-border);
+  border-radius: 14px;
+  background: var(--fd-surface);
+  box-shadow: none;
+}
+.manager-board .manager-content .panel-header {
+  gap: 20px;
+  padding: 24px;
+  border-color: var(--fd-border);
+}
+.manager-board .manager-content .panel-header h3 {
+  font-family: var(--fd-display-font);
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -.025em;
+  line-height: 1.4;
+}
+.manager-board .panel-header .help-text { font-size: 12px; line-height: 1.65; }
+.manager-board .count-label { padding: 4px 8px; border-radius: 999px; }
+.manager-board .data-table th {
+  padding: 15px 20px;
+  border-color: var(--fd-border);
+  background: var(--fd-surface-soft);
+  color: var(--fd-muted);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .07em;
+}
+.manager-board .data-table td {
+  padding: 20px;
+  border-color: var(--fd-border);
+  font-size: 13px;
+  line-height: 1.6;
+}
+.manager-board .data-table td strong { font-size: 13px; font-weight: 600; }
+.manager-board .data-table .help-text { font-size: 12px; line-height: 1.5; }
+.manager-board .data-table tbody tr:hover { background: var(--fd-surface-soft); }
+.manager-board .data-table .select-input.small {
+  min-height: 40px;
+  padding-block: 10px;
+  border-radius: 10px;
+  font-size: 12px;
+}
+.manager-board .manager-title-link {
+  color: var(--fd-text);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.6;
+}
+.manager-board .manager-title-link:hover { color: var(--fd-accent); }
+.manager-board :is(.manager-notice, .empty-state) { border-radius: 14px; }
+.manager-board .manager-section-heading { margin-bottom: 24px; }
+.manager-board .manager-section-heading h3,
+.manager-board .manager-station h3 {
+  font-family: var(--fd-display-font);
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -.035em;
+  line-height: 1.25;
+}
+.manager-board .manager-section-heading p,
+.manager-board .manager-station > .muted { font-size: 13px; line-height: 1.75; }
+.manager-board .manager-form-grid { gap: 18px; }
+.manager-board :is(.manager-form-card, .template-card) { padding: 24px; }
+.manager-board :is(.manager-form-card, .template-card) h3 {
+  font-family: var(--fd-display-font);
+  font-weight: 650;
+  line-height: 1.45;
+  letter-spacing: -.025em;
+}
+.manager-board :is(.manager-form-card, .template-card) p { font-size: 13px; line-height: 1.75; }
+.manager-board .template-card:hover { border-color: var(--fd-accent-border); transform: none; }
+.manager-board .manager-insight-stats { gap: 16px; }
+.manager-board .manager-insight-stat { gap: 14px; padding: 24px; }
+.manager-board .manager-insight-stat strong,
+.manager-board .manager-average strong { font-family: var(--fd-display-font); font-weight: 600; letter-spacing: -.04em; }
+.manager-board .manager-insight-stat span { font-size: 12px; }
+.manager-board .manager-insight-grid { gap: 18px; }
+.manager-board .manager-insight-grid .chart-label { font-size: 12px; }
+.manager-board .manager-station { padding: 32px; }
+.manager-board .manager-station-note p { font-size: 12px; line-height: 1.75; }
+.manager-board .manager-login { padding: 48px 32px; }
+.manager-board .manager-login .empty-icon {
+  border: 1px solid var(--fd-border);
+  border-radius: 14px;
+  background: var(--fd-surface-soft);
+}
+.manager-board .manager-login h3 {
+  font-family: var(--fd-display-font);
+  font-size: clamp(27px, 3vw, 36px);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -.04em;
+}
+.manager-board .manager-login p { max-width: 48ch; font-size: 14px; line-height: 1.75; }
+
+/* The corner composer keeps its fixed header and footer around the scrollable form. */
+.feedback-dock .feedback-composer {
+  border: 1px solid var(--fd-border-strong);
+  border-top: 3px solid var(--fd-accent);
+  border-radius: 14px;
+  background: var(--fd-surface);
+  box-shadow: 0 18px 64px #11131830;
+}
+.feedback-dock .composer-header {
+  gap: 16px;
+  padding: 24px 24px 20px;
+  border-color: var(--fd-border);
+  background: var(--fd-surface);
+}
+.feedback-dock .composer-header h2 {
+  margin: 0;
+  font-family: var(--fd-display-font);
+  font-size: 24px;
+  font-weight: 650;
+  line-height: 1.25;
+  letter-spacing: -.04em;
+}
+.feedback-dock .composer-draft-hint { max-width: 30ch; margin-top: 9px; font-size: 12px; line-height: 1.6; }
+.feedback-dock .composer-window-actions { gap: 5px; }
+.feedback-dock .composer-window-actions .icon-button { width: 36px; height: 36px; min-width: 36px; }
+.feedback-dock .composer-body { padding: 24px; scrollbar-gutter: stable; }
+.feedback-dock .composer-body .form-label { color: var(--fd-text-secondary); font-size: 12px; font-weight: 650; line-height: 1.65; }
+.feedback-dock .composer-body .text-area {
+  min-height: 130px;
+  padding: 14px 15px;
+  font-size: 14px;
+  line-height: 1.75;
+  resize: vertical;
+}
+.feedback-dock .composer-body :is(.text-area, .text-input) {
+  border: 1px solid var(--fd-border-strong);
+  border-radius: 10px;
+  background: var(--fd-input);
+  color: var(--fd-text);
+}
+.feedback-dock .composer-body :is(.text-area, .text-input)::placeholder { color: var(--fd-muted); }
+.feedback-dock .composer-body .help-text { font-size: 12px; line-height: 1.7; }
+.feedback-dock .composer-body .category-options { gap: 8px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.feedback-dock .composer-body .category-option {
+  min-height: 42px;
+  padding: 9px 7px;
+  border: 1px solid var(--fd-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--fd-text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
+}
+.feedback-dock .composer-body .category-option.active {
+  border-color: var(--fd-accent);
+  background: var(--fd-accent-soft);
+  color: var(--fd-accent);
+}
+.feedback-dock .composer-body .composer-option { margin-top: 20px; padding-top: 14px; border-color: var(--fd-border); }
+.feedback-dock .composer-option > .button { min-height: 36px; padding-block: 7px; color: var(--fd-text-secondary); font-size: 12px; }
+.feedback-dock .composer-visibility { margin-bottom: 18px; }
+.feedback-dock .composer-visibility label {
+  min-height: 44px;
+  border-color: var(--fd-border);
+  border-radius: 10px;
+  font-size: 12px;
+}
+.feedback-dock .composer-visibility label.active { border-color: var(--fd-accent); background: var(--fd-accent-soft); color: var(--fd-accent); }
+.feedback-dock .composer-body .choice-option { padding: 14px; border-color: var(--fd-border); border-radius: 10px; background: var(--fd-surface-soft); font-size: 13px; line-height: 1.65; }
+.feedback-dock .composer-body .choice-option input { width: 18px; height: 18px; flex-shrink: 0; margin-top: 2px; }
+.feedback-dock .composer-discard { padding: 18px; border-radius: 10px; }
+.feedback-dock .composer-footer { gap: 12px; padding: 18px 24px; border-color: var(--fd-border); background: var(--fd-surface); }
+.feedback-dock .composer-footer .button { min-height: 44px; padding: 11px 16px; font-size: 13px; border-radius: 999px; }
+.feedback-dock .composer-body .photo-thumb { border-radius: 10px; }
+.feedback-dock .composer-body .avatar-option { border-radius: 10px; }
+
+/* Public feedback and manager detail dialogs share the same quiet reading surface. */
+.feedback-app .modal-backdrop { background: var(--fd-backdrop); backdrop-filter: blur(8px); }
+.feedback-app .modal {
+  border-color: var(--fd-border-strong);
+  border-radius: 18px;
+  background: var(--fd-surface);
+  box-shadow: 0 24px 80px #11131830;
+  animation-timing-function: cubic-bezier(.22, 1, .36, 1);
+}
+.feedback-app .modal-header { align-items: center; padding: 22px 28px; border-color: var(--fd-border); }
+.feedback-app .modal-header h2 {
+  font-family: var(--fd-display-font);
+  font-size: 22px;
+  line-height: 1.3;
+  font-weight: 650;
+  letter-spacing: -.035em;
+}
+.feedback-app .modal-body { padding: 28px; scrollbar-gutter: stable; }
+.feedback-app .modal .wall-card-full {
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.feedback-app .modal .wall-card-full:hover { transform: none; box-shadow: none; }
+.feedback-app .modal .wall-card-full .feedback-card-top { padding: 0; }
+.feedback-app .modal .wall-card-full .feedback-card-body { padding: 22px 0; }
+.feedback-app .modal .wall-card-full .feedback-card-title { font-family: var(--fd-display-font); font-size: 25px; font-weight: 650; line-height: 1.4; letter-spacing: -.025em; }
+.feedback-app .modal .wall-card-full .wall-message { color: var(--fd-text-secondary); font-size: 14px; line-height: 1.85; }
+.feedback-app .modal .wall-card-full .wall-card-bottom { padding: 16px 0; background: transparent; }
+.feedback-app .modal .wall-card-full .wall-photos { padding-inline: 0; }
+.feedback-app .modal .wall-card-full .wall-location { padding: 0; font-size: 12px; line-height: 1.65; }
+.feedback-app .modal .manager-detail-profile h3,
+.feedback-app .modal .manager-detail-message h3 {
+  font-family: var(--fd-display-font);
+  font-weight: 650;
+  line-height: 1.4;
+  letter-spacing: -.025em;
+}
+.feedback-app .modal .manager-detail-message { margin-top: 26px; padding-top: 24px; }
+.feedback-app .modal .manager-detail-message p { max-width: 70ch; font-size: 14px; line-height: 1.85; }
+.feedback-app .modal .detail-label { font-size: 11px; line-height: 1.65; letter-spacing: .07em; }
+.feedback-app .modal .detail-item strong { font-size: 13px; line-height: 1.65; }
+.feedback-app .modal .manager-detail-photos { gap: 10px; background: transparent; }
+.feedback-app .modal .manager-detail-photos button { border-radius: 10px; }
+.feedback-app .feedback-progress {
+  padding: 22px;
+  margin-top: 22px;
+  border: 1px solid var(--fd-border);
+  border-radius: 14px;
+  background: var(--fd-background);
+}
+.feedback-app .feedback-progress-heading { font-size: 13px; line-height: 1.6; }
+.feedback-app .feedback-progress-heading > strong { font-weight: 650; }
+.feedback-app .feedback-progress-heading > span { font-size: 11px; line-height: 1.5; border-radius: 999px; padding: 4px 9px; background: var(--fd-surface); }
+.feedback-app .feedback-progress ol { margin: 22px 0 18px; gap: 0; }
+.feedback-app .feedback-progress li { gap: 10px; min-width: 0; padding-right: 10px; color: var(--fd-muted); font-size: 11px; }
+.feedback-app .feedback-progress li > span:last-child { line-height: 1.65; overflow-wrap: anywhere; }
+.feedback-app .feedback-progress .progress-node { width: 26px; height: 26px; border-color: var(--fd-border-strong); background: var(--fd-surface); }
+.feedback-app .feedback-progress li:not(:last-child)::after { top: 12px; left: 29px; right: 3px; height: 1px; }
+.feedback-app .feedback-progress li.reached { color: var(--fd-accent); }
+.feedback-app .feedback-progress .reached .progress-node { border-color: var(--fd-accent); background: var(--fd-surface); }
+.feedback-app .feedback-progress li[aria-current="step"] .progress-node { border-color: var(--fd-accent); background: var(--fd-accent); color: var(--fd-surface); }
+.feedback-app .feedback-progress p { max-width: 64ch; font-size: 12px; line-height: 1.75; }
+
+:is(.manager-board, .feedback-dock .feedback-composer, .feedback-app .modal) :is(.text-input, .text-area, .select-input) {
+  transition: border-color 180ms cubic-bezier(.22, 1, .36, 1), box-shadow 180ms cubic-bezier(.22, 1, .36, 1);
+}
+:is(.manager-board, .feedback-dock .feedback-composer, .feedback-app .modal) :is(.text-input, .text-area, .select-input):focus {
+  border-color: var(--fd-accent);
+  outline: 0;
+  box-shadow: 0 0 0 3px var(--fd-accent-soft);
+}
+:is(.manager-board, .feedback-dock .feedback-composer, .feedback-app .modal) :is(button, a):focus-visible {
+  outline: 2px solid var(--fd-accent);
+  outline-offset: 3px;
+}
+
+@media (max-width: 960px) {
+  .manager-overlay { padding: 18px; }
+  .manager-board { max-height: calc(100dvh - 36px); }
+  .manager-board .manager-header { padding: 24px; }
+  .manager-board .manager-tabs { padding-inline: 24px; }
+  .manager-board .manager-content { padding: 24px; }
+  .manager-board .manager-kpi { padding: 20px; }
+  .manager-board .manager-toolbar .select-input { max-width: none; }
+  .manager-board .manager-insight-stat { padding: 20px; gap: 12px; }
+}
+
+@media (max-width: 650px) {
+  .manager-overlay { padding: 10px; }
+  .manager-board { min-height: 0; max-height: calc(100dvh - 20px); border-radius: 14px; }
+  .manager-board .manager-header { padding: 22px 18px; gap: 12px; }
+  .manager-board .manager-header h2 { font-size: 25px; line-height: 1.25; }
+  .manager-board .manager-header .board-eyebrow { font-size: 9px; letter-spacing: .09em; }
+  .manager-board .manager-header p { font-size: 12px; }
+  .manager-board .manager-header > .row { gap: 6px; flex-shrink: 0; }
+  .manager-board .manager-tabs { padding-inline: 18px; gap: 24px; }
+  .manager-board .manager-tab { min-height: 52px; font-size: 13px; }
+  .manager-board .manager-content { padding: 20px 16px 24px; scrollbar-gutter: auto; }
+  .manager-board .manager-kpis { gap: 12px; margin-bottom: 20px; }
+  .manager-board .manager-kpi { padding: 18px 16px; min-height: 118px; gap: 16px; }
+  .manager-board .manager-kpi > span { font-size: 12px; }
+  .manager-board .manager-kpi strong { font-size: 32px; }
+  .manager-board .manager-review-strip { padding: 18px; gap: 16px; margin-bottom: 20px; }
+  .manager-board .manager-review-copy { align-items: flex-start; }
+  .manager-board .manager-review-copy p { font-size: 12px; }
+  .manager-board .manager-review-actions { align-self: stretch; justify-content: flex-end; }
+  .manager-board .manager-toolbar .board-search { flex-basis: 100%; }
+  .manager-board .manager-toolbar .select-input { flex-basis: calc(50% - 5px); font-size: 12px; }
+  .manager-board .manager-content .panel-header { padding: 20px 18px; flex-wrap: wrap; }
+  .manager-board .manager-content .panel-header h3 { font-size: 18px; }
+  .manager-board .data-table :is(th, td) { padding-inline: 18px; }
+  .manager-board .data-table td { padding-block: 18px; }
+  .manager-board .manager-title-link { min-height: 44px; }
+  .manager-board .manager-section-heading h3,
+  .manager-board .manager-station h3 { font-size: 24px; }
+  .manager-board .manager-form-card,
+  .manager-board .template-card { padding: 22px; }
+  .manager-board .manager-insight-stats { grid-template-columns: 1fr; gap: 10px; }
+  .manager-board .manager-insight-stat { flex-wrap: nowrap; justify-content: flex-start; padding: 18px; }
+  .manager-board .manager-insight-stat span { flex-basis: auto; text-align: left; font-size: 12px; }
+  .manager-board .manager-insight-grid .chart-row { grid-template-columns: 100px minmax(0, 1fr) 24px; }
+  .manager-board .manager-insight-grid .chart-label { font-size: 12px; }
+  .manager-board .manager-station { padding: 24px 18px; }
+  .manager-board .manager-login { min-height: 0; overflow-y: auto; padding: 36px 22px; }
+  .feedback-dock .composer-header { padding: 20px 18px 18px; gap: 12px; }
+  .feedback-dock .composer-header h2 { font-size: 23px; }
+  .feedback-dock .composer-draft-hint { font-size: 12px; line-height: 1.65; }
+  .feedback-dock .composer-body { padding: 20px 18px; scrollbar-gutter: auto; }
+  .feedback-dock .composer-footer { padding: 16px 18px; }
+  .feedback-dock .composer-option > .button { min-height: 44px; }
+  .feedback-dock .composer-body .category-option { min-height: 44px; }
+  .feedback-app .modal-backdrop { padding: 10px; }
+  .feedback-app .modal { border-radius: 14px; max-height: calc(100dvh - 20px); }
+  .feedback-app .modal-header { padding: 18px 20px; }
+  .feedback-app .modal-body { padding: 22px 20px; scrollbar-gutter: auto; }
+  .feedback-app .modal .wall-card-full .feedback-card-title { font-size: 23px; }
+  .feedback-app .feedback-progress { padding: 18px 14px; }
+  .feedback-app .feedback-progress-heading { align-items: flex-start; gap: 10px; }
+  .feedback-app .feedback-progress li { padding-right: 7px; font-size: 10px; }
+  .feedback-app .modal .toggle-row { align-items: flex-start; flex-wrap: wrap; }
+  :is(.manager-board, .feedback-dock .feedback-composer, .feedback-app .modal) :is(.button, .button.small, .icon-button, .select-input, .select-input.small, .text-input, .avatar-option, .remove-photo) { min-height: 44px; }
+  :is(.manager-board, .feedback-dock .feedback-composer, .feedback-app .modal) .icon-button { width: 44px; min-width: 44px; height: 44px; }
+  .feedback-dock .composer-body .avatar-option { width: 44px; height: 44px; }
+  .feedback-dock .composer-body .remove-photo { width: 44px; height: 44px; border-radius: 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .manager-board .manager-kpi,
+  .manager-board .manager-tab,
+  :is(.manager-board, .feedback-dock .feedback-composer, .feedback-app .modal) :is(.text-input, .text-area, .select-input) { transition: none; }
+  .feedback-app .modal,
+  .feedback-app .modal-backdrop { animation: none; }
+}
